@@ -18,13 +18,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
-public class User{
-    @Id
-    @UuidGenerator
-    @Column
-    private UUID id;
-
+public class User extends EntityBase{
     @Column(name = "USERNAME",nullable = false,unique = true)
     private String username;
 
@@ -34,12 +28,4 @@ public class User{
     @Enumerated(EnumType.STRING)
     @Column(name = "ROLE")
     private Role role;
-
-    @CreatedDate
-    @Column(name = "CREATED_AT" ,updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(name = "UPDATED_AT")
-    private LocalDateTime updatedAt;
 }
