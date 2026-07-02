@@ -1,0 +1,120 @@
+@import "../login/loginPage.css";
+
+/* ------------------------------------------------------------- */
+/* REGISTER-SPECIFIC COMPACT RIGHT COLUMN (NO SCROLL ON DESKTOP) */
+/* ------------------------------------------------------------- */
+
+.register-page-wrapper .login-right {
+  flex: 0.9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+.register-page-wrapper .login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 22px 28px 18px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 12px 30px rgba(12, 166, 198, 0.05);
+}
+
+.register-page-wrapper .login-form {
+  gap: 12px;
+  /* reduced gap */
+}
+
+.register-page-wrapper .login-input {
+  padding: 12px 20px 12px 50px;
+  /* reduced height */
+  font-size: 14.5px;
+}
+
+.register-page-wrapper .login-btn {
+  padding: 12px 24px;
+  /* reduced button height */
+  font-size: 15px;
+  margin-top: 4px;
+}
+
+.register-page-wrapper .social-divider {
+  margin: 10px 0 6px;
+  /* reduced margin */
+}
+
+.register-page-wrapper .social-divider-text {
+  font-size: 12px;
+}
+
+.register-page-wrapper .social-list {
+  gap: 12px;
+}
+
+.register-page-wrapper .social-item {
+  width: 42px;
+  /* reduced dimensions */
+  height: 42px;
+}
+
+.register-page-wrapper .register-prompt {
+  margin-top: 16px;
+  /* reduced margin */
+  font-size: 13.5px;
+}
+
+/* ------------------------------------------------------------- */
+/* RESPONSIVE OVERRIDES                                          */
+/* ------------------------------------------------------------- */
+
+@media (max-width: 1023px) {
+  .register-page-wrapper {
+    flex-direction: column;
+    background: radial-gradient(circle at 50% 15%, rgba(12, 166, 198, 0.07) 0%, transparent 60%),
+      linear-gradient(180deg, #f0fafd 0%, #ffffff 100%);
+  }
+
+  .register-page-wrapper .login-left {
+    display: none;
+  }
+
+  .register-page-wrapper .login-right {
+    flex: 1;
+    width: 100%;
+    min-height: 100vh;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    padding: 30px 16px 0px;
+    justify-content: flex-start;
+  }
+
+  .register-page-wrapper .login-card {
+    padding: 24px 20px;
+    margin-top: 10px;
+    max-width: 380px;
+  }
+
+  .register-page-wrapper .login-input {
+    font-size: 16px;
+    /* Prevents auto-zoom on mobile Safari */
+    padding: 14px 20px 14px 50px;
+  }
+
+  .register-page-wrapper .login-btn {
+    padding: 14px 24px;
+    font-size: 16px;
+  }
+
+  .register-page-wrapper .social-item {
+    width: 48px;
+    height: 48px;
+  }
+}

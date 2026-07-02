@@ -27,9 +27,9 @@ public class CurrentUserUtils {
         return user!= null ? user.getUserId():null;
     }
 
-    public static String getUsername(){
+    public static String getEmail(){
         CustomUserPrincipal user = getCurrentUser();
-        return user!= null ? user.getUsername():null;
+        return user!= null ? user.getEmail():null;
     }
 
     public static Role getRole(){

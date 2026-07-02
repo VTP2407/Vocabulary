@@ -9,7 +9,7 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 public class CustomUserPrincipal {
+    private String email;
     private Long userId;
-    private String username;
     private Role role;
 }
