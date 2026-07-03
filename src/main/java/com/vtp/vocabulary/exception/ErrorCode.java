@@ -4,6 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum ErrorCode {
+    FILE_NOT_EXIST("404","file not exist"),
+    INVALID_PASSWORD("405","password is incorrect"),
     USER_NOT_EXIST("404","user not exist"),
     USER_INFO_NOT_EXIST("404","user info not exist"),
     USERNAME_OR_PASSWORD_INCORRECT("401","username or password incorrect"),

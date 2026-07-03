@@ -31,8 +31,15 @@ public class AuthenticationService {
     private final UserAuthProviderRepository userAuthProviderRepository;
 
     public LoginResponse login(LoginRequest request){
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(()-> new BusinessException(ErrorCode.USERNAME_OR_PASSWORD_INCORRECT));
+        User user;
+        if(!request.getUsername().contains("@")){
+            user = userRepository.findByUsername(request.getUsername())
+                    .orElseThrow(()-> new BusinessException(ErrorCode.USERNAME_OR_PASSWORD_INCORRECT));
+        }else{
+            user = userRepository.findByEmail(request.getUsername())
+                    .orElseThrow(()-> new BusinessException(ErrorCode.USER_NOT_EXIST));
+        }
+
         boolean passwordMatches = passwordEncoder.matches(
                 request.getPassword(),
                 user.getPassword()

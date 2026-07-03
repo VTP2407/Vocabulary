@@ -18,4 +18,7 @@ public class UserInfo extends EntityBase{
 
     @Column(name = "FULL_NAME")
     private String fullName;
+
+    @Column(name = "IMAGE_ID")
+    private Long imageId;
 }

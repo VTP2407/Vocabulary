@@ -1,0 +1,316 @@
+/* homePage.css - Styling for Vocabulary Master Homepage */
+
+.homepage-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 20px 0 60px;
+  box-sizing: border-box;
+  background: radial-gradient(circle at 10% 10%, rgba(12, 166, 198, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 90% 90%, rgba(12, 166, 198, 0.05) 0%, transparent 40%);
+}
+
+/* BANNER SECTION */
+.banner-section {
+  text-align: center;
+  width: 100%;
+  max-width: 900px;
+  position: relative;
+}
+
+.banner-title {
+  font-family: var(--heading);
+  font-size: 42px;
+  font-weight: 850;
+  color: #0b4c5c;
+  margin: 0 0 16px;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.banner-subtitle {
+  font-size: 17px;
+  font-weight: 500;
+  color: #5b7c88;
+  margin: 0 auto;
+  max-width: 700px;
+  line-height: 1.5;
+}
+
+/* ILLUSTRATION CENTER CONTAINER */
+.illustration-center-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 60px;
+  width: 100%;
+  margin-top: 36px;
+  position: relative;
+}
+
+.mascot-wrapper {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.main-mascot {
+  max-height: 120px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 24px rgba(12, 166, 198, 0.15));
+  animation: floatMascot 4s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+/* Flying book decorations */
+.decor-img {
+  max-height: 60px;
+  width: auto;
+  object-fit: contain;
+  opacity: 0.85;
+}
+
+.decor-book-left {
+  animation: floatLeftBook 5s ease-in-out infinite;
+  transform: rotate(-12deg);
+}
+
+.decor-book-right {
+  animation: floatRightBook 5.5s ease-in-out infinite;
+  transform: scaleX(-1) rotate(15deg);
+}
+
+/* Sparkle elements */
+.sparkle-spark,
+.sparkle-spark-alt {
+  position: absolute;
+  color: #0ca6c6;
+  font-size: 20px;
+  pointer-events: none;
+  animation: sparklePulse 3s ease-in-out infinite;
+}
+
+.sparkle-spark {
+  top: -10px;
+  right: -20px;
+}
+
+.sparkle-spark-alt {
+  bottom: 10px;
+  left: -20px;
+  animation-delay: 1.5s;
+}
+
+@keyframes floatMascot {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+@keyframes floatLeftBook {
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(-12deg);
+  }
+
+  50% {
+    transform: translateY(-12px) rotate(-8deg);
+  }
+}
+
+@keyframes floatRightBook {
+
+  0%,
+  100% {
+    transform: scaleX(-1) translateY(0) rotate(15deg);
+  }
+
+  50% {
+    transform: scaleX(-1) translateY(-14px) rotate(10deg);
+  }
+}
+
+@keyframes sparklePulse {
+
+  0%,
+  100% {
+    transform: scale(0.8);
+    opacity: 0.3;
+  }
+
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}
+
+/* CARDS GRID SECTION */
+.modes-grid-section {
+  width: 100%;
+  margin-bottom: 48px;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  width: 100%;
+}
+
+/* CARD STYLING */
+.mode-card {
+  background: #ffffff;
+  border-radius: 28px;
+  border: 1.5px solid rgba(12, 166, 198, 0.08);
+  box-shadow: 0 15px 35px rgba(12, 166, 198, 0.05), 0 5px 15px rgba(0, 0, 0, 0.01);
+  padding: 36px 24px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+}
+
+.mode-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(12, 166, 198, 0.1), 0 8px 20px rgba(0, 0, 0, 0.02);
+  border-color: rgba(12, 166, 198, 0.2);
+}
+
+.card-icon-wrapper {
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.card-icon {
+  max-height: 84px;
+  width: auto;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.mode-card:hover .card-icon {
+  transform: scale(1.08) rotate(2deg);
+}
+
+.card-title {
+  font-family: var(--heading);
+  font-size: 20px;
+  font-weight: 750;
+  color: #0b4c5c;
+  margin: 0 0 12px;
+  line-height: 1.25;
+}
+
+.card-description {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #64748b;
+  margin-bottom: 28px;
+  flex: 1;
+  /* Pushes the button to the bottom */
+}
+
+/* BUTTON INSIDE CARD */
+.card-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 14px;
+  font-weight: 750;
+  color: #ffffff;
+  background-color: #0ca6c6;
+  border-radius: 24px;
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(12, 166, 198, 0.15);
+}
+
+.card-btn:hover {
+  background-color: #0ba3c3;
+  box-shadow: 0 6px 16px rgba(12, 166, 198, 0.25);
+  transform: translateY(-1px);
+}
+
+.card-btn:active {
+  transform: translateY(1px);
+}
+
+/* FOOTER SECTION */
+.homepage-footer {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.other-activities-link {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0ca6c6;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.other-activities-link:hover {
+  color: #08829c;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 1024px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .banner-title {
+    font-size: 36px;
+  }
+}
+
+@media (max-width: 600px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .banner-title {
+    font-size: 28px;
+  }
+
+  .banner-subtitle {
+    font-size: 15px;
+  }
+
+  .illustration-center-container {
+    gap: 24px;
+  }
+
+  .decor-img {
+    max-height: 40px;
+  }
+
+  .main-mascot {
+    max-height: 90px;
+  }
+
+  .mode-card {
+    padding: 28px 20px;
+  }
+}
