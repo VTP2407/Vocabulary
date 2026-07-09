@@ -10,6 +10,7 @@ import FlashCardPage from "../pages/flashCard/flashCard";
 import ExercisePage from "../pages/exercise/exercise";
 import TestPage from "../pages/test/test";
 import VocabularyPage from "../pages/vocabulary/vocabulary";
+import MyWordSetsPage from "../pages/myWordSets/myWordSets";
 
 function AppRoutes() {
     return (
@@ -30,6 +31,7 @@ function AppRoutes() {
                     <Route path="exercise" element={<ExercisePage />} />
                     <Route path="test" element={<TestPage />} />
                     <Route path="vocabulary" element={<VocabularyPage />} />
+                    <Route path="my-sets" element={<MyWordSetsPage />} />
                     
                     {/* Hỗ trợ chuyển hướng từ /user về trang chủ / */}
                     <Route path="user" element={<Navigate to="/" replace />} />

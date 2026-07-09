@@ -1,0 +1,633 @@
+/* vocabulary.css - Trang trí chức năng thêm bộ từ mới */
+
+.vocab-page-container {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 10px 0 40px;
+  animation: fadeInVocab 0.4s ease-out;
+}
+
+/* Tiêu đề chính */
+.vocab-page-header {
+  margin-bottom: 28px;
+}
+
+.vocab-title {
+  font-family: var(--heading);
+  font-size: 32px;
+  font-weight: 850;
+  color: #0b4c5c;
+  margin: 0 0 8px;
+  letter-spacing: -0.5px;
+}
+
+.vocab-subtitle {
+  font-size: 15.5px;
+  color: #5b7c88;
+  margin: 0;
+}
+
+/* Form Thẻ chính */
+.vocab-card {
+  background: #ffffff;
+  border-radius: 24px;
+  border: 1.5px solid rgba(12, 166, 198, 0.12);
+  box-shadow: 0 15px 40px rgba(12, 166, 198, 0.06), 0 5px 15px rgba(0, 0, 0, 0.01);
+  padding: 32px;
+  box-sizing: border-box;
+}
+
+/* Khung thông tin bộ từ */
+.vocab-section-title {
+  font-family: var(--heading);
+  font-size: 18px;
+  font-weight: 750;
+  color: #0b4c5c;
+  margin: 0 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1.5px solid rgba(12, 166, 198, 0.08);
+  padding-bottom: 8px;
+}
+
+/* Bố cục lưới thông tin chính */
+.vocab-form-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.vocab-full-width {
+  grid-column: span 2;
+}
+
+/* Ô nhập liệu */
+.vocab-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+}
+
+.vocab-form-group label {
+  font-size: 14.5px;
+  font-weight: 750;
+  color: #0b4c5c;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vocab-form-group label .required-dot {
+  color: #e11d48;
+  margin-left: 4px;
+}
+
+.vocab-input {
+  padding: 12px 16px;
+  font-size: 14.5px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(12, 166, 198, 0.2);
+  background-color: #ffffff;
+  color: #0b4c5c;
+  outline: none;
+  transition: all 0.25s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.vocab-input:focus {
+  border-color: #0ca6c6;
+  box-shadow: 0 0 0 3.5px rgba(12, 166, 198, 0.12);
+  background-color: #ffffff;
+}
+
+.vocab-textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+/* Container mô tả */
+.vocab-desc-container {
+  display: flex;
+  width: 100%;
+}
+
+.vocab-desc-textarea-wrapper {
+  flex-grow: 1;
+  width: 100%;
+}
+
+/* Nút chọn phạm vi duy nhất (Toggle Pill) */
+.visibility-single-toggle {
+  display: flex;
+  margin-top: 2px;
+}
+
+.visibility-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-size: 14.5px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border: 1.5px solid rgba(12, 166, 198, 0.15);
+  background-color: #ffffff;
+  width: auto;
+  white-space: nowrap;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+.visibility-toggle-btn.public {
+  background-color: #f0fdf4;
+  border-color: #10b981;
+  color: #15803d;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.1);
+}
+
+.visibility-toggle-btn.private {
+  background-color: #fef2f2;
+  border-color: #f43f5e;
+  color: #be123c;
+  box-shadow: 0 4px 10px rgba(244, 63, 94, 0.1);
+}
+
+.visibility-toggle-btn:hover {
+  filter: brightness(0.97);
+  transform: translateY(-0.5px);
+}
+
+.visibility-toggle-btn:active {
+  transform: translateY(0.5px);
+}
+
+/* DANH SÁCH TỪ VỰNG - BẢNG */
+.vocab-list-section {
+  margin-top: 12px;
+}
+
+.vocab-list-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.vocab-list-title {
+  font-family: var(--heading);
+  font-size: 18px;
+  font-weight: 750;
+  color: #0b4c5c;
+  margin: 0;
+}
+
+.vocab-list-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vocab-list-count {
+  font-size: 13.5px;
+  font-weight: 600;
+  background-color: #eef9fd;
+  color: #0ca6c6;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(12, 166, 198, 0.15);
+  white-space: nowrap;
+}
+
+/* Dropdown container */
+.add-column-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.btn-add-column {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #ffffff;
+  border: 1.5px solid #0ca6c6;
+  color: #0ca6c6;
+  padding: 6px 16px;
+  font-size: 13.5px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.btn-add-column:hover {
+  background-color: #eef9fd;
+  color: #08829c;
+  border-color: #08829c;
+}
+
+.add-column-dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 6px;
+  background-color: #ffffff;
+  border: 1.5px solid rgba(12, 166, 198, 0.15);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(12, 166, 198, 0.08);
+  z-index: 100;
+  min-width: 140px;
+  overflow: hidden;
+  animation: fadeInDropdown 0.2s ease-out;
+}
+
+.dropdown-item {
+  padding: 10px 16px;
+  font-size: 13.5px;
+  color: #0b4c5c;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 600;
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  background-color: #eef9fd;
+  color: #0ca6c6;
+}
+
+.dropdown-item.disabled {
+  color: #94a3b8;
+  background-color: #f8fafc;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+@keyframes fadeInDropdown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Bảng hiển thị danh sách từ */
+.vocab-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 16px;
+  border: 1.5px solid rgba(12, 166, 198, 0.1);
+  background-color: #ffffff;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.01);
+  margin-bottom: 24px;
+}
+
+.vocab-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  min-width: 600px;
+}
+
+.vocab-table th {
+  background-color: #eef9fd;
+  color: #0d687a;
+  font-weight: 750;
+  font-size: 14px;
+  padding: 14px 16px;
+  border-bottom: 1.5px solid rgba(12, 166, 198, 0.12);
+  white-space: nowrap;
+}
+
+.vocab-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(12, 166, 198, 0.06);
+  vertical-align: middle;
+}
+
+.vocab-table tr:last-child td {
+  border-bottom: none;
+}
+
+.vocab-table tr:hover {
+  background-color: rgba(12, 166, 198, 0.02);
+}
+
+/* Cột số thứ tự */
+.col-stt {
+  width: 60px;
+  text-align: center;
+  font-weight: 700;
+  color: #5b7c88;
+}
+
+.stt-badge {
+  background-color: #f1f5f9;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+
+/* Định nghĩa cột */
+.col-word {
+  width: 30%;
+}
+
+.col-def {
+  width: 35%;
+}
+
+.col-example {
+  width: 35%;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.col-action {
+  width: 60px;
+  text-align: center;
+}
+
+.example-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+}
+
+.btn-remove-column {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  transition: all 0.2s ease;
+}
+
+.btn-remove-column:hover {
+  background-color: #ffe4e6;
+  color: #e11d48;
+}
+
+/* Ô nhập liệu dạng bảng */
+.table-input {
+  border: 1px solid rgba(12, 166, 198, 0.15);
+  padding: 9px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  color: #0b4c5c;
+  outline: none;
+  background-color: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.table-input:focus {
+  border-color: #0ca6c6;
+  box-shadow: 0 0 0 2.5px rgba(12, 166, 198, 0.1);
+}
+
+.table-input::placeholder {
+  color: #94a3b8;
+  font-size: 13.5px;
+}
+
+/* Nút xóa hàng (dấu trừ) */
+.btn-delete-row {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #ffe4e6;
+  background-color: #fff1f2;
+  color: #e11d48;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-delete-row:hover {
+  background-color: #ffe4e6;
+  color: #be123c;
+  border-color: #fecdd3;
+  transform: scale(1.08);
+}
+
+.btn-delete-row:active {
+  transform: scale(0.95);
+}
+
+/* Nút thêm từ mới ở dưới bảng */
+.vocab-table-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.btn-add-row-bottom {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #ffffff;
+  border: 1.5px dashed rgba(12, 166, 198, 0.3);
+  color: #0d687a;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-add-row-bottom:hover {
+  background-color: #eef9fd;
+  border-color: #0ca6c6;
+  color: #0ca6c6;
+  transform: translateY(-1px);
+}
+
+/* Trạng thái bảng rỗng */
+.empty-table-placeholder {
+  text-align: center;
+  padding: 40px 20px;
+  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.empty-icon {
+  font-size: 32px;
+  color: #cbd5e1;
+}
+
+/* FOOTER BUTTONS / HÀNH ĐỘNG GỬI FORM */
+.vocab-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 36px;
+  border-top: 1.5px solid rgba(12, 166, 198, 0.08);
+  padding-top: 24px;
+}
+
+.btn-vocab-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  font-size: 15px;
+  font-weight: 750;
+  color: #ffffff;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.btn-vocab-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+  filter: brightness(1.05);
+}
+
+.btn-vocab-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-vocab-cancel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  font-size: 15px;
+  font-weight: 750;
+  color: #64748b;
+  background-color: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-vocab-cancel:hover:not(:disabled) {
+  background-color: #f1f5f9;
+  color: #334155;
+  transform: translateY(-1px);
+}
+
+.btn-vocab-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* THÔNG BÁO */
+.vocab-alert {
+  padding: 14px 20px;
+  border-radius: 14px;
+  margin-bottom: 24px;
+  font-size: 14.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: slideDownAlert 0.3s ease-out;
+}
+
+.vocab-alert.success {
+  background-color: #f0fdf4;
+  color: #16a34a;
+  border: 1.5px solid #bbf7d0;
+}
+
+.vocab-alert.error {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1.5px solid #fecaca;
+}
+
+/* KEYFRAMES ANIMATIONS */
+@keyframes fadeInVocab {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDownAlert {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* RESPONSIVE DESIGN FOR VOCABULARY PAGE */
+@media (max-width: 768px) {
+  .vocab-form-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .vocab-full-width {
+    grid-column: span 1;
+  }
+  
+  .vocab-desc-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  
+  .vocab-card {
+    padding: 20px;
+  }
+  
+  .vocab-form-actions {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .btn-vocab-submit,
+  .btn-vocab-cancel {
+    width: 100%;
+    justify-content: center;
+  }
+}

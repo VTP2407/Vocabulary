@@ -1,0 +1,687 @@
+/* myWordSets.css - Trang trí giao diện Bộ từ của tôi */
+
+.my-vocab-page-wrapper {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 10px 20px 40px;
+  animation: fadeInMyVocab 0.4s ease-out;
+  box-sizing: border-box;
+}
+
+@keyframes fadeInMyVocab {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header */
+.my-vocab-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.header-text-section h1 {
+  font-family: var(--heading, sans-serif);
+  font-size: 32px;
+  font-weight: 850;
+  color: #0b4c5c;
+  margin: 0 0 8px;
+  letter-spacing: -0.5px;
+}
+
+.header-text-section p {
+  font-size: 15.5px;
+  color: #5b7c88;
+  margin: 0;
+}
+
+/* Nút tạo bộ từ mới */
+.btn-create-set {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #0ca6c6 0%, #0b8fa8 100%);
+  color: #ffffff;
+  font-weight: 750;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(12, 166, 198, 0.2);
+  transition: all 0.25s ease;
+}
+
+.btn-create-set:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(12, 166, 198, 0.35);
+}
+
+.btn-create-set:active {
+  transform: translateY(0);
+}
+
+/* Controls - Nút bấm và Tìm kiếm */
+.my-vocab-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  background: #ffffff;
+  padding: 16px 24px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(12, 166, 198, 0.1);
+  box-shadow: 0 10px 25px rgba(12, 166, 198, 0.04);
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+/* Tabs */
+.tab-buttons-group {
+  display: flex;
+  gap: 12px;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 12px;
+}
+
+.tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #475569;
+  font-weight: 700;
+  font-size: 14.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  color: #0b4c5c;
+}
+
+.tab-btn.active {
+  background: #ffffff;
+  color: #0b4c5c;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Tìm kiếm */
+.search-bar-wrapper {
+  position: relative;
+  width: 320px;
+  max-width: 100%;
+}
+
+.search-bar-wrapper input {
+  width: 100%;
+  padding: 10px 16px 10px 40px;
+  font-size: 14.5px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(12, 166, 198, 0.2);
+  outline: none;
+  color: #0b4c5c;
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+}
+
+.search-bar-wrapper input:focus {
+  border-color: #0ca6c6;
+  box-shadow: 0 0 0 3px rgba(12, 166, 198, 0.1);
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #5b7c88;
+  font-size: 16px;
+}
+
+/* Grid của bộ từ */
+.my-vocab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+/* Card */
+.vocab-set-card {
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1.5px solid rgba(12, 166, 198, 0.12);
+  padding: 24px;
+  box-shadow: 0 10px 25px rgba(12, 166, 198, 0.03);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 200px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+}
+
+.vocab-set-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(12, 166, 198, 0.35);
+  box-shadow: 0 15px 35px rgba(12, 166, 198, 0.08), 0 5px 15px rgba(0, 0, 0, 0.01);
+}
+
+.card-top {
+  margin-bottom: 20px;
+}
+
+.card-badge-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.visibility-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 750;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.visibility-badge.public {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.visibility-badge.private {
+  background: #fff1f2;
+  color: #e11d48;
+}
+
+.word-count-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.card-title {
+  font-family: var(--heading, sans-serif);
+  font-size: 18px;
+  font-weight: 750;
+  color: #0b4c5c;
+  margin: 0 0 10px;
+  line-height: 1.4;
+}
+
+.card-desc {
+  font-size: 13.5px;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Nút hành động trong Card */
+.card-actions {
+  display: flex;
+  gap: 8px;
+  border-top: 1.5px solid rgba(12, 166, 198, 0.06);
+  padding-top: 16px;
+  margin-top: auto;
+}
+
+.btn-action {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.btn-study {
+  background: #f0fdfd;
+  color: #0ca6c6;
+  border: 1px solid rgba(12, 166, 198, 0.2);
+}
+
+.btn-study:hover {
+  background: #0ca6c6;
+  color: #ffffff;
+}
+
+.btn-exercise {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid rgba(37, 99, 235, 0.15);
+}
+
+.btn-exercise:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.btn-unsave {
+  background: #fff5f5;
+  color: #e11d48;
+  border: 1px solid rgba(225, 29, 72, 0.15);
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+}
+
+.btn-unsave:hover {
+  background: #e11d48;
+  color: #ffffff;
+}
+
+/* Empty, Loading, Error States */
+.my-vocab-loading,
+.my-vocab-error,
+.my-vocab-empty {
+  text-align: center;
+  padding: 60px 40px;
+  background: #ffffff;
+  border-radius: 24px;
+  border: 1.5px solid rgba(12, 166, 198, 0.1);
+  box-shadow: 0 10px 30px rgba(12, 166, 198, 0.03);
+  margin-top: 10px;
+}
+
+.spinner {
+  font-size: 40px;
+  color: #0ca6c6;
+  margin-bottom: 16px;
+}
+
+.error-icon {
+  font-size: 45px;
+  color: #e11d48;
+  margin-bottom: 16px;
+}
+
+.empty-icon {
+  font-size: 48px;
+  color: #94a3b8;
+  margin-bottom: 16px;
+}
+
+.my-vocab-loading p,
+.my-vocab-error p,
+.my-vocab-empty p {
+  font-size: 15px;
+  color: #64748b;
+  margin: 0;
+}
+
+.btn-retry {
+  margin-top: 16px;
+  padding: 10px 24px;
+  background: #0ca6c6;
+  color: #ffffff;
+  font-weight: 700;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-retry:hover {
+  background: #0b8fa8;
+}
+
+.empty-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-create-set-empty {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: #0ca6c6;
+  color: #ffffff;
+  font-weight: 750;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(12, 166, 198, 0.15);
+  transition: all 0.25s ease;
+}
+
+.btn-create-set-empty:hover {
+  background: #0b8fa8;
+  transform: translateX(2px);
+}
+
+/* Prompt đăng nhập */
+.login-prompt-card {
+  max-width: 480px;
+  margin: 60px auto;
+  text-align: center;
+  background: #ffffff;
+  padding: 40px 32px;
+  border-radius: 24px;
+  border: 1.5px solid rgba(12, 166, 198, 0.12);
+  box-shadow: 0 15px 40px rgba(12, 166, 198, 0.08);
+}
+
+.prompt-icon {
+  font-size: 48px;
+  color: #0ca6c6;
+  margin-bottom: 20px;
+}
+
+.login-prompt-card h2 {
+  font-family: var(--heading, sans-serif);
+  font-size: 24px;
+  color: #0b4c5c;
+  margin: 0 0 12px;
+  font-weight: 800;
+}
+
+.login-prompt-card p {
+  font-size: 14.5px;
+  color: #5b7c88;
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+
+.btn-prompt-login {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  background: #0ca6c6;
+  color: #ffffff;
+  font-weight: 750;
+  font-size: 15px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-prompt-login:hover {
+  background: #0b8fa8;
+  transform: translateY(-1px);
+}
+
+/* MODAL CHI TIẾT TỪ VỰNG */
+.detail-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(11, 76, 92, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  animation: fadeInOverlay 0.25s ease-out;
+}
+
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.detail-modal-content {
+  background: #ffffff;
+  border-radius: 24px;
+  width: 90%;
+  max-width: 760px;
+  max-height: 85vh;
+  box-shadow: 0 20px 50px rgba(11, 76, 92, 0.15);
+  display: flex;
+  flex-direction: column;
+  animation: scaleInContent 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+
+@keyframes scaleInContent {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.detail-modal-header {
+  padding: 20px 28px;
+  border-bottom: 1.5px solid rgba(12, 166, 198, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fafc;
+}
+
+.header-titles h2 {
+  font-family: var(--heading, sans-serif);
+  font-size: 20px;
+  font-weight: 800;
+  color: #0b4c5c;
+  margin: 0 0 6px;
+}
+
+.btn-close-modal {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: #64748b;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.btn-close-modal:hover {
+  color: #e11d48;
+  background: rgba(225, 29, 72, 0.05);
+}
+
+.detail-modal-body {
+  padding: 24px 28px;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.detail-description {
+  font-size: 14.5px;
+  color: #475569;
+  background: #f1f5f9;
+  padding: 12px 18px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  line-height: 1.5;
+  border-left: 4px solid #0ca6c6;
+}
+
+.modal-words-list h3 {
+  font-size: 16px;
+  font-weight: 750;
+  color: #0b4c5c;
+  margin: 0 0 14px;
+}
+
+/* Bảng hiển thị từ vựng chi tiết */
+.detail-words-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.detail-words-table th {
+  background: #f1f5f9;
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 13.5px;
+  font-weight: 750;
+  color: #0b4c5c;
+  border-bottom: 1.5px solid rgba(12, 166, 198, 0.08);
+}
+
+.detail-words-table td {
+  padding: 14px 16px;
+  font-size: 14px;
+  color: #334155;
+  border-bottom: 1px solid #f1f5f9;
+  line-height: 1.5;
+}
+
+.detail-words-table tr:hover td {
+  background-color: #f8fafc;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.font-bold {
+  font-weight: 700;
+  color: #64748b;
+}
+
+.word-name-cell {
+  font-weight: 700;
+  color: #0b4c5c;
+  font-size: 14.5px;
+}
+
+.word-example-cell {
+  color: #64748b;
+  font-style: italic;
+}
+
+.detail-loading,
+.detail-empty {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.detail-loading p,
+.detail-empty p {
+  color: #64748b;
+  font-size: 14px;
+  margin: 8px 0 0;
+}
+
+/* Footer Modal */
+.detail-modal-footer {
+  padding: 18px 28px;
+  border-top: 1.5px solid rgba(12, 166, 198, 0.08);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background: #f8fafc;
+}
+
+.btn-footer-study {
+  padding: 10px 20px;
+  background: #0ca6c6;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13.5px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-footer-study:hover {
+  background: #0b8fa8;
+}
+
+.btn-footer-exercise {
+  padding: 10px 20px;
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13.5px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-footer-exercise:hover {
+  background: #1d4ed8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .my-vocab-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .btn-create-set {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .my-vocab-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-bar-wrapper {
+    width: 100%;
+  }
+
+  .my-vocab-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-modal-content {
+    width: 95%;
+  }
+
+  .detail-modal-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

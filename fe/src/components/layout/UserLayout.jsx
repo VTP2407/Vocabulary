@@ -15,7 +15,8 @@ import {
   LoadingOutlined,
   EditOutlined,
   SaveOutlined,
-  LockOutlined
+  LockOutlined,
+  FolderOpenOutlined
 } from "@ant-design/icons";
 import userApi from "../../api/userApi";
 import "./UserLayout.css";
@@ -538,6 +539,13 @@ function UserLayout() {
             >
               <TeamOutlined className="nav-icon" />
               <span className="nav-text">Bạn bè</span>
+            </NavLink>
+            <NavLink
+              to="/my-sets"
+              className={({ isActive }) => (isActive ? "nav-item active" : "nav-item")}
+            >
+              <FolderOpenOutlined className="nav-icon" />
+              <span className="nav-text">Bộ từ của tôi</span>
             </NavLink>
           </nav>
 
