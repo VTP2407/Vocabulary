@@ -1,9 +1,10 @@
 package com.vtp.vocabulary.Entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Setter
@@ -22,6 +23,8 @@ public class Word extends EntityBase{
     @Column(name = "EXAMPLE")
     private String example;
 
-    @Column(name = "WORD_SET_ID")
-    private Long wordSetId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "WORD_SET_ID", nullable = false)
+    @JsonIgnore
+    private WordSet wordSet;
 }

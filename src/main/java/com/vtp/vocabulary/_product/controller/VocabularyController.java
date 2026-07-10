@@ -1,7 +1,6 @@
 package com.vtp.vocabulary._product.controller;
 
-import com.vtp.vocabulary.Entity.SaveWordSet;
-import com.vtp.vocabulary._product.service.SaveWordSetService;
+import com.vtp.vocabulary._product.service.SavedWordSetService;
 import com.vtp.vocabulary._product.service.WordService;
 import com.vtp.vocabulary._product.service.WordSetService;
 import com.vtp.vocabulary.dto.request.CreateSetWordRequest;
@@ -10,15 +9,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/word-set")
 @RequiredArgsConstructor
 public class VocabularyController {
     private final WordService wordService;
     private final WordSetService wordSetService;
-    private final SaveWordSetService saveWordSetService;
+    private final SavedWordSetService savedWordSetService;
 
     @PostMapping("/create")
     CreateWordSetResponse createWordSet(@RequestBody CreateSetWordRequest request){
@@ -42,13 +39,13 @@ public class VocabularyController {
     }
 
     @PostMapping("/{wordSetId}/save")
-    String saveWordSet(@RequestParam Long wordSetId){
-        return saveWordSetService.saveWordSet(wordSetId);
+    String saveWordSet(@PathVariable Long wordSetId){
+        return savedWordSetService.saveWordSet(wordSetId);
     }
 
     @DeleteMapping("/{wordSetId}/unsave")
-    String unsaveWordSet(@RequestParam Long wordSetId){
-        return saveWordSetService.unsaveWordSet(wordSetId);
+    String unsaveWordSet(@PathVariable Long wordSetId){
+        return savedWordSetService.unsaveWordSet(wordSetId);
     }
 
     @GetMapping("/saved")
@@ -60,7 +57,12 @@ public class VocabularyController {
     }
 
     @GetMapping("/{wordSetId}")
-    PublicWordSetDetail getPublicWordSetDetail(@RequestParam Long wordSetId){
+    PublicWordSetDetail getPublicWordSetDetail(@PathVariable Long wordSetId){
         return wordSetService.getPublicWordSetDetail(wordSetId);
+    }
+
+    @GetMapping("/saved/{savedWordSetId}")
+    SavedWordSetDetail getSavedWordSetDetail(@PathVariable Long savedWordSetId){
+        return savedWordSetService.getSavedWordSetDetail(savedWordSetId);
     }
 }

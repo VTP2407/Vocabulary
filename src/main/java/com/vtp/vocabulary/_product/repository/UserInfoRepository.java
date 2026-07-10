@@ -14,7 +14,7 @@ public interface UserInfoRepository extends JpaRepository<UserInfo,Long> {
     @Query("""
             SELECT fullName
             FROM UserInfo u
-            WHERE u.id =:id
+            WHERE u.userId =:userId
             """)
-    String getFullNameById(Long id);
+    String getFullNameByUserId(Long userId);
 }

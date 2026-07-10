@@ -9,6 +9,7 @@ import {
   ArrowRightOutlined,
   DeleteOutlined,
   EyeOutlined,
+  EyeInvisibleOutlined,
   LoadingOutlined,
   ExclamationCircleOutlined,
   SearchOutlined,
@@ -33,6 +34,7 @@ function MyWordSetsPage() {
   const [selectedSet, setSelectedSet] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [wordSetDetail, setWordSetDetail] = useState(null);
+  const [expandedWordIds, setExpandedWordIds] = useState(new Set());
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -87,8 +89,21 @@ function MyWordSetsPage() {
     setSelectedSet(set);
     setDetailLoading(true);
     setWordSetDetail(null);
+    setExpandedWordIds(new Set());
     try {
-      const detail = await vocabApi.getWordSetDetail(set.id);
+      const detail = activeTab === "saved"
+        ? await vocabApi.getSavedWordSetDetail(set.savedWordSetId || set.id)
+        : await vocabApi.getWordSetDetail(set.id);
+      
+      if (activeTab === "saved" && detail) {
+        // Chuẩn hóa dữ liệu trả về từ backend: map learningWordResponses thành words và wordId thành id
+        const rawWords = detail.learningWordResponses || detail.words || [];
+        detail.words = rawWords.map(w => ({
+          ...w,
+          id: w.id || w.wordId
+        }));
+      }
+      
       setWordSetDetail(detail);
     } catch (err) {
       console.error("Lỗi khi tải chi tiết bộ từ:", err);
@@ -102,19 +117,113 @@ function MyWordSetsPage() {
     }
   };
 
+  const handleToggleWord = (wordId) => {
+    setExpandedWordIds(prev => {
+      const next = new Set(prev);
+      if (next.has(wordId)) {
+        next.delete(wordId);
+      } else {
+        next.add(wordId);
+      }
+      return next;
+    });
+  };
+
+  const handleToggleAllWords = () => {
+    if (!wordSetDetail || !wordSetDetail.words) return;
+    const allWordIds = wordSetDetail.words.map(w => w.id);
+    const areAllExpanded = allWordIds.every(id => expandedWordIds.has(id));
+    if (areAllExpanded) {
+      setExpandedWordIds(new Set());
+    } else {
+      setExpandedWordIds(new Set(allWordIds));
+    }
+  };
+
   const handleCloseDetail = () => {
     setSelectedSet(null);
     setWordSetDetail(null);
+    setExpandedWordIds(new Set());
   };
 
-  const handleStudy = (e, id) => {
-    e.stopPropagation();
-    navigate(`/flash-card?id=${id}`);
+  const getWordExp = (wordId) => {
+    const key = `word_exp_${wordId}`;
+    const stored = localStorage.getItem(key);
+    if (stored) {
+      return parseInt(stored, 10);
+    }
+    // Sinh EXP giả lập cố định để giao diện hiển thị đủ 6 cấp độ (0 -> 5)
+    const mockExps = [0, 5, 12, 45, 110, 260, 450];
+    const exp = mockExps[wordId % mockExps.length];
+    localStorage.setItem(key, exp.toString());
+    return exp;
   };
 
-  const handleExercise = (e, id) => {
+  const getLevelInfo = (exp) => {
+    let level = 0;
+    let color = '#94a3b8'; // Đồng (Xám Pastel)
+    let bg = '#f8fafc';
+    let name = 'Đồng';
+    let progress = 0;
+    let expDisplay = "";
+    
+    if (exp >= 435) {
+      level = 5;
+      color = '#a0c4ff'; // Thần thoại (Xanh pastel / Cầu vồng)
+      bg = '#fef2f2';
+      name = 'Thần thoại';
+      progress = 100;
+      expDisplay = `${exp}`;
+    } else if (exp >= 185) {
+      level = 4;
+      color = '#ff9800'; // Kim cương (Cam Pastel)
+      bg = '#fff7ed';
+      name = 'Kim cương';
+      progress = Math.round(((exp - 185) / 250) * 100);
+      expDisplay = `${exp} / 435`;
+    } else if (exp >= 85) {
+      level = 3;
+      color = '#ba68c8'; // Bạch kim (Tím Pastel)
+      bg = '#faf5ff';
+      name = 'Bạch kim';
+      progress = Math.round(((exp - 85) / 100) * 100);
+      expDisplay = `${exp} / 185`;
+    } else if (exp >= 35) {
+      level = 2;
+      color = '#42a5f5'; // Vàng (Xanh dương Pastel)
+      bg = '#eff6ff';
+      name = 'Vàng';
+      progress = Math.round(((exp - 35) / 50) * 100);
+      expDisplay = `${exp} / 85`;
+    } else if (exp >= 10) {
+      level = 1;
+      color = '#66bb6a'; // Bạc (Xanh lá Pastel)
+      bg = '#f0fdf4';
+      name = 'Bạc';
+      progress = Math.round(((exp - 10) / 25) * 100);
+      expDisplay = `${exp} / 35`;
+    } else {
+      level = 0;
+      color = '#94a3b8'; // Đồng (Xám Pastel)
+      bg = '#f8fafc';
+      name = 'Đồng';
+      progress = Math.round((exp / 10) * 100);
+      expDisplay = `${exp} / 10`;
+    }
+    
+    return { level, color, bg, name, progress, expDisplay };
+  };
+
+  const handleStudy = (e, id, savedWordSetId) => {
     e.stopPropagation();
-    navigate(`/exercise?id=${id}`);
+    const queryId = savedWordSetId || id;
+    navigate(`/flash-card?id=${queryId}`);
+  };
+
+  const handleExercise = (e, id, savedWordSetId) => {
+    e.stopPropagation();
+    const queryId = savedWordSetId || id;
+    navigate(`/exercise?id=${queryId}`);
   };
 
   // Lọc bộ từ theo tìm kiếm
@@ -249,10 +358,10 @@ function MyWordSetsPage() {
                 </div>
 
                 <div className="card-actions">
-                  <button className="btn-action btn-study" onClick={(e) => handleStudy(e, set.id)}>
+                  <button className="btn-action btn-study" onClick={(e) => handleStudy(e, set.id, set.savedWordSetId)}>
                     Học ngay
                   </button>
-                  <button className="btn-action btn-exercise" onClick={(e) => handleExercise(e, set.id)}>
+                  <button className="btn-action btn-exercise" onClick={(e) => handleExercise(e, set.id, set.savedWordSetId)}>
                     Luyện tập
                   </button>
                   {activeTab === "saved" && (
@@ -277,10 +386,15 @@ function MyWordSetsPage() {
           <div className="detail-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="detail-modal-header">
               <div className="header-titles">
-                <h2>{selectedSet?.setName || selectedSet?.wordSetName || "Chi tiết bộ từ"}</h2>
-                <span className={`visibility-badge ${selectedSet.visibility.toLowerCase()}`}>
-                  {selectedSet.visibility === "PUBLIC" ? "Công khai" : "Riêng tư"}
-                </span>
+                <div className="title-row" style={{ display: "flex", alignItems: "baseline", gap: "10px", flexWrap: "wrap" }}>
+                  <h2 style={{ margin: 0 }}>{selectedSet?.setName || selectedSet?.wordSetName || "Chi tiết bộ từ"}</h2>
+                  {wordSetDetail?.createBy && (
+                    <span className="modal-creator-name" style={{ fontSize: "14px", color: "#64748b", fontWeight: "normal" }}>by {wordSetDetail.createBy}</span>
+                  )}
+                </div>
+                {selectedSet.description && (
+                  <p className="modal-description-text" style={{ margin: "6px 0 0", fontSize: "14px", color: "#475569", lineHeight: "1.5" }}>{selectedSet.description}</p>
+                )}
               </div>
               <button className="btn-close-modal" onClick={handleCloseDetail}>
                 <CloseOutlined />
@@ -288,20 +402,6 @@ function MyWordSetsPage() {
             </div>
 
             <div className="detail-modal-body">
-              {(selectedSet.description || wordSetDetail?.createBy) && (
-                <div className="detail-description">
-                  {wordSetDetail?.createBy && (
-                    <div style={{ marginBottom: selectedSet.description ? "6px" : "0" }}>
-                      <strong>Người tạo: </strong> {wordSetDetail.createBy}
-                    </div>
-                  )}
-                  {selectedSet.description && (
-                    <div>
-                      <strong>Mô tả: </strong> {selectedSet.description}
-                    </div>
-                  )}
-                </div>
-              )}
 
               {detailLoading ? (
                 <div className="detail-loading">
@@ -310,29 +410,92 @@ function MyWordSetsPage() {
                 </div>
               ) : wordSetDetail && wordSetDetail.words && wordSetDetail.words.length > 0 ? (
                 <div className="modal-words-list">
-                  <h3>Danh sách từ vựng ({wordSetDetail.words.length} từ)</h3>
-                  <table className="detail-words-table">
-                    <thead>
-                      <tr>
-                        <th style={{ width: "60px" }}>STT</th>
-                        <th style={{ width: "200px" }}>Từ vựng</th>
-                        <th>Định nghĩa</th>
-                        {wordSetDetail.words.some(w => w.example) && <th>Ví dụ</th>}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {wordSetDetail.words.map((word, idx) => (
-                        <tr key={word.id || idx}>
-                          <td className="text-center font-bold">{idx + 1}</td>
-                          <td className="word-name-cell">{word.name}</td>
-                          <td>{word.definition}</td>
-                          {wordSetDetail.words.some(w => w.example) && (
-                            <td className="word-example-cell">{word.example || "-"}</td>
-                          )}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  <div className="modal-words-list-header">
+                    <h3>Danh sách từ vựng ({wordSetDetail.words.length} từ)</h3>
+                    <button className="btn-toggle-all" onClick={handleToggleAllWords}>
+                      {wordSetDetail.words.every(w => expandedWordIds.has(w.id)) ? "Ẩn tất cả nghĩa" : "Hiện tất cả nghĩa"}
+                    </button>
+                  </div>
+                  <div className="words-grid">
+                    {wordSetDetail.words.map((word, idx) => {
+                      const isExpanded = expandedWordIds.has(word.id);
+                      const fontStyle = {
+                        fontSize: word.name.length > 25
+                          ? "11px"
+                          : word.name.length > 18
+                            ? "13.5px"
+                            : "16px"
+                      };
+                      
+                      // Tính toán EXP và Level (chỉ hiển thị khi đang ở tab bộ từ đã lưu)
+                      const wordExp = activeTab === "saved" ? (word.exp !== undefined ? word.exp : getWordExp(word.id)) : 0;
+                      const levelInfo = activeTab === "saved" ? getLevelInfo(wordExp) : null;
+                      
+                      return (
+                        <div
+                          key={word.id || idx}
+                          className={`word-card ${isExpanded ? "flipped" : ""} ${activeTab === "saved" ? `has-level level-${levelInfo.level}` : ""}`}
+                          onClick={() => handleToggleWord(word.id)}
+                        >
+                          <div className="word-card-inner">
+                            {/* Mặt trước: Từ vựng & Tiến trình */}
+                            <div className="word-card-front">
+                              {activeTab === "saved" ? (
+                                <div 
+                                  className="word-level-badge" 
+                                  style={{ 
+                                    color: levelInfo.color, 
+                                    backgroundColor: levelInfo.bg, 
+                                    borderColor: levelInfo.color 
+                                  }}
+                                  title={`EXP tích lũy của từ: ${wordExp}`}
+                                >
+                                  {levelInfo.level}
+                                </div>
+                              ) : (
+                                <div className="word-card-index">{idx + 1}</div>
+                              )}
+                              <div className="card-face-body">
+                                <div className="word-name" style={fontStyle}>
+                                  {word.name}
+                                </div>
+                              </div>
+                              {activeTab === "saved" && (
+                                <div className="word-progress-section" onClick={(e) => e.stopPropagation()}>
+                                  <div className="word-progress-bar-wrapper">
+                                    <div className="word-progress-bar-bg">
+                                      <div 
+                                        className="word-progress-bar-fill" 
+                                        style={{ 
+                                          width: `${levelInfo.progress}%`,
+                                          backgroundColor: levelInfo.color 
+                                        }}
+                                      />
+                                    </div>
+                                    <span className="word-exp-text">{levelInfo.expDisplay}</span>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Mặt sau: Nghĩa & Ví dụ */}
+                            <div className="word-card-back">
+                              <div className="card-face-body">
+                                <div className="word-definition">
+                                  {word.definition}
+                                </div>
+                                {word.example && (
+                                  <div className="word-example">
+                                    <em>{word.example}</em>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               ) : (
                 <div className="detail-empty">
@@ -343,10 +506,10 @@ function MyWordSetsPage() {
             </div>
 
             <div className="detail-modal-footer">
-              <button className="btn-footer-study" onClick={(e) => { handleStudy(e, selectedSet.id); handleCloseDetail(); }}>
+               <button className="btn-footer-study" onClick={(e) => { handleStudy(e, selectedSet.id, selectedSet.savedWordSetId); handleCloseDetail(); }}>
                 Học bằng Flash Card
               </button>
-              <button className="btn-footer-exercise" onClick={(e) => { handleExercise(e, selectedSet.id); handleCloseDetail(); }}>
+              <button className="btn-footer-exercise" onClick={(e) => { handleExercise(e, selectedSet.id, selectedSet.savedWordSetId); handleCloseDetail(); }}>
                 Luyện tập bài tập
               </button>
             </div>

@@ -28,7 +28,7 @@ function LoginPage() {
             const data = await authApi.login({ username, password });
             localStorage.setItem("token", data.token);
             // Reload page or handle auth state update
-            window.location.href = "/";
+            window.location.href = import.meta.env.BASE_URL;
         }
         catch (error) {
             console.error(error);
@@ -62,7 +62,7 @@ function LoginPage() {
             localStorage.setItem("tokenType", response.tokenType);
             
             // Chuyển hướng người dùng về trang chủ sau khi đăng nhập thành công
-            window.location.href = "/";
+            window.location.href = import.meta.env.BASE_URL;
         } catch (error) {
             console.error("Google login failed:", error);
         }

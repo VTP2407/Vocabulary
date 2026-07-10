@@ -37,7 +37,7 @@ function RegisterPage() {
             await authApi.register({ username, password, rePassword, email });
             setSuccessMsg("Đăng ký thành công! Đang chuyển hướng đăng nhập...");
             setTimeout(() => {
-                window.location.href = "/login";
+                window.location.href = `${import.meta.env.BASE_URL}login`;
             }, 1500);
         }
         catch (error) {
@@ -72,7 +72,7 @@ function RegisterPage() {
             localStorage.setItem("tokenType", response.tokenType);
 
             // Chuyển hướng thẳng về trang chủ sau khi đăng nhập Google thành công
-            window.location.href = "/";
+            window.location.href = import.meta.env.BASE_URL;
         } catch (error) {
             console.error("Google login failed:", error);
             message.error("Đăng nhập Google thất bại");

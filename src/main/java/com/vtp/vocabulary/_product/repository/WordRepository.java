@@ -13,9 +13,11 @@ public interface WordRepository extends JpaRepository<Word,Long> {
     @Query("""
             SELECT COUNT(*)
             FROM Word ws
-            WHERE ws.wordSetId =:id
+            WHERE ws.wordSet.id =:id
             """)
     Long getCount(@Param("id") Long id);
+
+    List<Word> findAllByWordSet_Id(Long wordSetId);
 
     List<Word> findAllByWordSetId(Long wordSetId);
 }

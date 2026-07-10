@@ -14,7 +14,7 @@ import MyWordSetsPage from "../pages/myWordSets/myWordSets";
 
 function AppRoutes() {
     return (
-        <BrowserRouter>
+        <BrowserRouter basename={import.meta.env.BASE_URL}>
             <Routes>
                 {/* Auth/Public Layout */}
                 <Route element={<PublicLayout />}>

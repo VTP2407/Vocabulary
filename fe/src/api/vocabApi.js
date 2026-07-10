@@ -89,22 +89,18 @@ const vocabApi = {
     },
 
     // Lưu bộ từ vựng (Bookmark)
-    // - Request: POST /api/word-set/{wordSetId}/save?wordSetId={wordSetId}
+    // - Request: POST /api/word-set/{wordSetId}/save
     // - Response (Kết quả trả về): Chuỗi thông báo thành công từ backend
     saveWordSet: async (wordSetId) => {
-        const response = await axiosClient.post(`/api/word-set/${wordSetId}/save`, null, {
-            params: { wordSetId }
-        });
+        const response = await axiosClient.post(`/api/word-set/${wordSetId}/save`);
         return response.data;
     },
 
     // Bỏ lưu bộ từ vựng (Unbookmark)
-    // - Request: DELETE /api/word-set/{wordSetId}/unsave?wordSetId={wordSetId}
+    // - Request: DELETE /api/word-set/{wordSetId}/unsave
     // - Response (Kết quả trả về): Chuỗi thông báo thành công từ backend
     unsaveWordSet: async (wordSetId) => {
-        const response = await axiosClient.delete(`/api/word-set/${wordSetId}/unsave`, {
-            params: { wordSetId }
-        });
+        const response = await axiosClient.delete(`/api/word-set/${wordSetId}/unsave`);
         return response.data;
     },
 
@@ -126,6 +122,13 @@ const vocabApi = {
     //   }
     getWordSetDetail: async (wordSetId) => {
         const response = await axiosClient.get(`/api/word-set/${wordSetId}`);
+        return response.data;
+    },
+
+    // Lấy chi tiết bộ từ đã lưu (kèm tiến trình học của từng từ)
+    // - Request: GET /api/word-set/saved/{savedWordSetId}
+    getSavedWordSetDetail: async (savedWordSetId) => {
+        const response = await axiosClient.get(`/api/word-set/saved/${savedWordSetId}`);
         return response.data;
     },
 

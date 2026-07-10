@@ -215,7 +215,7 @@ function UserLayout() {
     localStorage.removeItem("username_login");
     setIsLoggedIn(false);
     setAvatarUrl(null);
-    window.location.href = "/";
+    window.location.href = import.meta.env.BASE_URL;
   };
 
   const getUserIdFromToken = () => {

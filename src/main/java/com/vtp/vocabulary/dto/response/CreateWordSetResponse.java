@@ -1,9 +1,7 @@
 package com.vtp.vocabulary.dto.response;
 
-import com.vtp.vocabulary.Entity.Word;
 import com.vtp.vocabulary.enumeration.Visibility;
 import lombok.*;
-import org.checkerframework.checker.units.qual.A;
 
 import java.util.List;
 
@@ -21,5 +19,5 @@ public class CreateWordSetResponse {
 
     private Visibility visibility;
 
-    private List<Word> words;
+    private List<WordResponse> wordSetResponses;
 }

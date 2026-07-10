@@ -14,6 +14,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -459,8 +460,13 @@
 }
 
 @keyframes fadeInOverlay {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .detail-modal-content {
@@ -481,6 +487,7 @@
     opacity: 0;
     transform: scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -684,4 +691,522 @@
     flex-direction: column;
     align-items: stretch;
   }
+}
+
+/* ==========================================================================
+   CSS CHO GIAO DIỆN GRID CARDS, LEVEL BADGE VÀ TIẾN ĐỘ EXP CHO TỪNG TỪ
+   ========================================================================== */
+
+/* Header của danh sách từ trong modal */
+.modal-words-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+  border-bottom: 1.5px solid rgba(12, 166, 198, 0.08);
+  padding-bottom: 10px;
+}
+
+.modal-words-list-header h3 {
+  margin: 0 !important;
+}
+
+.btn-toggle-all {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 8px;
+  border: 1.5px solid rgba(12, 166, 198, 0.25);
+  background: #ffffff;
+  color: #0ca6c6;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-toggle-all:hover {
+  background: #f0fdfd;
+  border-color: #0ca6c6;
+  transform: translateY(-1px);
+}
+
+/* Lưới hiển thị các thẻ từ */
+.words-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+/* Thẻ từ vựng cơ bản */
+/* Thẻ từ vựng lật (3D Card Flip) */
+.word-card {
+  perspective: 1000px;
+  cursor: pointer;
+  height: 95px;
+  position: relative;
+  background: transparent;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+  box-sizing: border-box;
+  transition: transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.word-card:hover {
+  transform: translateY(-3px);
+}
+
+.word-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+/* Trigger lật thẻ */
+.word-card.flipped .word-card-inner {
+  transform: rotateY(180deg);
+}
+
+/* Mặt trước và mặt sau */
+.word-card-front,
+.word-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: 16px;
+  border: 1.5px solid rgba(12, 166, 198, 0.12);
+  background: #ffffff;
+  padding: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 4px 10px rgba(12, 166, 198, 0.02);
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.word-card:hover .word-card-front,
+.word-card:hover .word-card-back {
+  border-color: rgba(12, 166, 198, 0.35);
+  box-shadow: 0 8px 18px rgba(12, 166, 198, 0.07);
+}
+
+/* Mặt sau có màu nền và cuộn khi nội dung quá dài */
+.word-card-back {
+  transform: rotateY(180deg);
+  background: #fdfefe;
+  border-color: rgba(12, 166, 198, 0.2);
+  overflow-y: auto;
+}
+
+.word-card-back::-webkit-scrollbar {
+  width: 4px;
+}
+
+.word-card-back::-webkit-scrollbar-thumb {
+  background: rgba(12, 166, 198, 0.15);
+  border-radius: 4px;
+}
+
+/* Header inside card faces */
+.card-face-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* Body inside card faces */
+.card-face-body {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  width: 100%;
+  margin: 4px 0;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.word-card-front .card-face-body {
+  align-items: center;
+  text-align: center;
+}
+
+.word-card-back .card-face-body {
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+}
+
+/* Số thứ tự cho từ */
+.word-card-index {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: #f1f5f9;
+  color: #64748b;
+  font-weight: 800;
+  font-size: 11px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.word-card-index-inline {
+  color: #94a3b8;
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+/* Badge Cấp độ hình tròn có viền */
+.word-level-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.8px solid currentColor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  z-index: 2;
+}
+
+.word-name {
+  font-weight: 800;
+  color: #0b4c5c;
+  word-break: break-word;
+}
+
+/* Phần hiển thị tiến trình EXP của từ */
+.word-progress-section {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0 10px 8px;
+  box-sizing: border-box;
+}
+
+.word-progress-bar-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 80%;
+}
+
+.word-progress-bar-bg {
+  height: 5px;
+  background-color: #e2e8f0;
+  border-radius: 10px;
+  /* flex-grow: 1; */
+  overflow: hidden;
+  position: relative;
+}
+
+.word-progress-bar-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+.word-exp-text {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #64748b;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.word-definition {
+  font-size: 13px;
+  color: #334155;
+  line-height: 1.4;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  width: 100%;
+}
+
+.word-example {
+  font-size: 12px;
+  color: #64748b;
+  font-style: italic;
+  line-height: 1.4;
+  border-left: 2.5px solid rgba(12, 166, 198, 0.25);
+  padding-left: 8px;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.card-back-label {
+  font-size: 9px;
+  color: #94a3b8;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.word-card-action {
+  color: #cbd5e1;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+
+.word-card:hover .word-card-action {
+  color: #0ca6c6;
+}
+
+@media (max-width: 768px) {
+  .words-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Custom styles for saved level-based word cards to differentiate them completely from library cards */
+.word-card.has-level {
+  height: 98px;
+  /* Tối ưu chiều cao để không bị trống mà vẫn chứa đủ phần nổi */
+}
+
+.word-card.has-level .word-card-front {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 2px solid currentColor;
+  padding: 0;
+  box-sizing: border-box;
+  overflow: visible;
+  /* Cho phép badge và progress bar hiển thị tràn xuống cạnh viền */
+}
+
+.word-card.has-level .word-card-back {
+  border-radius: 16px;
+  border: 2px solid currentColor;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+/* Định vị level badge hình tròn ở góc dưới bên phải */
+.word-card.has-level .word-level-badge {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  top: auto;
+  left: auto;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2.5px solid currentColor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 800;
+  color: currentColor;
+  z-index: 10;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+/* Container cho thanh tiến trình EXP sát phía dưới (nhỏ như ban đầu) */
+.word-card.has-level .word-progress-section {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  right: 32px;
+  /* Chừa chỗ cho level badge ở góc dưới phải */
+  z-index: 5;
+  box-sizing: border-box;
+  padding: 0;
+  /* Bỏ padding thừa kế */
+  margin: 0;
+  /* Bỏ margin thừa */
+}
+
+.word-card.has-level .word-progress-bar-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.word-card.has-level .word-progress-bar-bg {
+  height: 5px;
+  /* Kích thước nhỏ như ban đầu */
+  background-color: #e2e8f0;
+  border-radius: 10px;
+  flex-grow: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.word-card.has-level .word-progress-bar-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+.word-card.has-level .word-exp-text {
+  display: none;
+}
+
+/* Căn giữa tên từ trong thẻ mặt trước */
+.word-card.has-level .word-card-front .card-face-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin: 0;
+  padding: 0 10px 10px 10px;
+  /* Chừa khoảng trống cho thanh tiến trình nổi */
+  box-sizing: border-box;
+}
+
+.word-card.has-level .word-card-front .word-name {
+  font-size: 17px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+/* Style specific levels (màu sắc cấp độ tương thích với JS) */
+/* Level 0: Slate/Gray */
+.word-card.has-level.level-0 {
+  color: #94a3b8;
+}
+
+.word-card.has-level.level-0 .word-card-front {
+  background-color: #ffffff;
+}
+
+.word-card.has-level.level-0 .word-card-back {
+  background: #f8fafc;
+}
+
+/* Level 1: Green/Teal */
+.word-card.has-level.level-1 {
+  color: #66bb6a;
+}
+
+.word-card.has-level.level-1 .word-card-front {
+  background-color: #ffffff;
+}
+
+.word-card.has-level.level-1 .word-card-back {
+  background: #f0fdf4;
+}
+
+/* Level 2: Blue */
+.word-card.has-level.level-2 {
+  color: #42a5f5;
+}
+
+.word-card.has-level.level-2 .word-card-front {
+  background-color: #ffffff;
+}
+
+.word-card.has-level.level-2 .word-card-back {
+  background: #eff6ff;
+}
+
+/* Level 3: Purple */
+.word-card.has-level.level-3 {
+  color: #ba68c8;
+}
+
+.word-card.has-level.level-3 .word-card-front {
+  background-color: #ffffff;
+}
+
+.word-card.has-level.level-3 .word-card-back {
+  background: #faf5ff;
+}
+
+/* Level 4: Orange/Amber */
+.word-card.has-level.level-4 {
+  color: #ff9800;
+}
+
+.word-card.has-level.level-4 .word-card-front {
+  background-color: #ffffff;
+}
+
+.word-card.has-level.level-4 .word-card-back {
+  background: #fff7ed;
+}
+
+/* Level 5: Red (Mythic) -> Rainbow Cầu vồng dạng Gradient! */
+.word-card.has-level.level-5 {
+  color: #a0c4ff; /* Nhạt hơn */
+}
+
+.word-card.has-level.level-5 .word-card-front {
+  border: 2px solid transparent;
+  background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(90deg, #ffadad, #ffd6a5, #fdffb6, #caffbf, #9bf6ff, #a0c4ff, #bdb2ff, #ffc6ff, #ffadad);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+.word-card.has-level.level-5 .word-card-back {
+  border: 2px solid transparent;
+  background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(90deg, #ffadad, #ffd6a5, #fdffb6, #caffbf, #9bf6ff, #a0c4ff, #bdb2ff, #ffc6ff, #ffadad);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+.word-card.has-level.level-5 .word-level-badge {
+  border: 2.5px solid transparent;
+  background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(135deg, #ffadad, #ffd6a5, #caffbf, #a0c4ff, #bdb2ff);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  color: #7b88ff; /* Chữ số 5 có màu tím pastel đậm dễ nhìn */
+}
+
+.word-card.has-level.level-5 .word-progress-bar-fill {
+  background: linear-gradient(90deg, #ffadad, #ffd6a5, #fdffb6, #caffbf, #9bf6ff, #a0c4ff, #bdb2ff);
+}
+
+/* Back face styling overrides inside has-level cards */
+.word-card.has-level .word-card-back .word-definition {
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 13.5px;
+  padding: 0 12px;
+}
+
+.word-card.has-level .word-card-back .word-example {
+  color: #475569;
+  border-left-color: currentColor;
+  font-size: 11.5px;
+  padding-left: 8px;
 }

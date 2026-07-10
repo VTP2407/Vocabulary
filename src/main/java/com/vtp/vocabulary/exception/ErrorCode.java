@@ -4,7 +4,10 @@ import lombok.Getter;
 
 @Getter
 public enum ErrorCode {
+    WORD_SET_ALREADY_SAVED("403","word set already saved"),
+    SAVED_WORD_SET_NOT_FOUND("404","save word set not exist"),
     WORD_SET_NOT_FOUND("404","word set not exist"),
+    WORD_NOT_FOUND("404","word not exist"),
     FILE_NOT_EXIST("404","file not exist"),
     INVALID_PASSWORD("405","password is incorrect"),
     USER_NOT_EXIST("404","user not exist"),

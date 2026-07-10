@@ -11,7 +11,9 @@ import {
   ArrowRightOutlined,
   StarOutlined,
   StarFilled,
-  CloseOutlined
+  CloseOutlined,
+  EyeOutlined,
+  EyeInvisibleOutlined
 } from "@ant-design/icons";
 import vocabApi from "../../api/vocabApi";
 import "./library.css";
@@ -37,6 +39,7 @@ function LibraryPage() {
   const [selectedSet, setSelectedSet] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [wordSetDetail, setWordSetDetail] = useState(null);
+  const [expandedWordIds, setExpandedWordIds] = useState(new Set());
 
   useEffect(() => {
     fetchPublicSets(currentPage);
@@ -103,10 +106,33 @@ function LibraryPage() {
     }
   };
 
+  const handleUnsaveSet = async (e, id) => {
+    e.stopPropagation();
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    if (!window.confirm("Bạn có chắc chắn muốn bỏ lưu bộ từ này không?")) return;
+
+    setSavingId(id);
+    try {
+      await vocabApi.unsaveWordSet(id);
+      setSavedSetIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(id);
+        return newSet;
+      });
+    } catch (err) {
+      console.error("Lỗi khi bỏ lưu bộ từ:", err);
+      alert("Bỏ lưu thất bại, vui lòng thử lại!");
+    } finally {
+      setSavingId(null);
+    }
+  };
   const handleOpenDetail = async (set) => {
     setSelectedSet(set);
     setDetailLoading(true);
     setWordSetDetail(null);
+    setExpandedWordIds(new Set());
     try {
       const detail = await vocabApi.getWordSetDetail(set.id);
       setWordSetDetail(detail);
@@ -121,9 +147,33 @@ function LibraryPage() {
     }
   };
 
+  const handleToggleWord = (wordId) => {
+    setExpandedWordIds(prev => {
+      const next = new Set(prev);
+      if (next.has(wordId)) {
+        next.delete(wordId);
+      } else {
+        next.add(wordId);
+      }
+      return next;
+    });
+  };
+
+  const handleToggleAllWords = () => {
+    if (!wordSetDetail || !wordSetDetail.words) return;
+    const allWordIds = wordSetDetail.words.map(w => w.id);
+    const areAllExpanded = allWordIds.every(id => expandedWordIds.has(id));
+    if (areAllExpanded) {
+      setExpandedWordIds(new Set());
+    } else {
+      setExpandedWordIds(new Set(allWordIds));
+    }
+  };
+
   const handleCloseDetail = () => {
     setSelectedSet(null);
     setWordSetDetail(null);
+    setExpandedWordIds(new Set());
   };
 
   const handleStudy = (e, id) => {
@@ -227,9 +277,9 @@ function LibraryPage() {
                     </button>
                     <button
                       className={`btn-action btn-bookmark ${isSaved ? "saved" : ""}`}
-                      onClick={(e) => !isSaved && handleSaveSet(e, set.id)}
-                      disabled={isSaved || savingId === set.id}
-                      title={isSaved ? "Đã lưu bộ từ này" : "Lưu bộ từ vựng"}
+                      onClick={(e) => isSaved ? handleUnsaveSet(e, set.id) : handleSaveSet(e, set.id)}
+                      disabled={savingId === set.id}
+                      title={isSaved ? "Bỏ lưu bộ từ" : "Lưu bộ từ vựng"}
                     >
                       {savingId === set.id ? (
                         <LoadingOutlined />
@@ -286,8 +336,15 @@ function LibraryPage() {
           <div className="detail-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="detail-modal-header">
               <div className="header-titles">
-                <h2>{selectedSet.setName || selectedSet.wordSetName || "Chi tiết bộ từ"}</h2>
-                <span className="visibility-badge public">Công khai</span>
+                <div className="title-row" style={{ display: "flex", alignItems: "baseline", gap: "10px", flexWrap: "wrap" }}>
+                  <h2 style={{ margin: 0 }}>{selectedSet.setName || selectedSet.wordSetName || "Chi tiết bộ từ"}</h2>
+                  {wordSetDetail?.createBy && (
+                    <span className="modal-creator-name" style={{ fontSize: "14px", color: "#64748b", fontWeight: "normal" }}>by {wordSetDetail.createBy}</span>
+                  )}
+                </div>
+                {selectedSet.description && (
+                  <p className="modal-description-text" style={{ margin: "6px 0 0", fontSize: "14px", color: "#475569", lineHeight: "1.5" }}>{selectedSet.description}</p>
+                )}
               </div>
               <button className="btn-close-modal" onClick={handleCloseDetail}>
                 <CloseOutlined />
@@ -295,20 +352,6 @@ function LibraryPage() {
             </div>
 
             <div className="detail-modal-body">
-              {(selectedSet.description || wordSetDetail?.createBy) && (
-                <div className="detail-description">
-                  {wordSetDetail?.createBy && (
-                    <div style={{ marginBottom: selectedSet.description ? "6px" : "0" }}>
-                      <strong>Người tạo: </strong> {wordSetDetail.createBy}
-                    </div>
-                  )}
-                  {selectedSet.description && (
-                    <div>
-                      <strong>Mô tả: </strong> {selectedSet.description}
-                    </div>
-                  )}
-                </div>
-              )}
 
               {detailLoading ? (
                 <div className="detail-loading">
@@ -317,29 +360,57 @@ function LibraryPage() {
                 </div>
               ) : wordSetDetail && wordSetDetail.words && wordSetDetail.words.length > 0 ? (
                 <div className="modal-words-list">
-                  <h3>Danh sách từ vựng ({wordSetDetail.words.length} từ)</h3>
-                  <table className="detail-words-table">
-                    <thead>
-                      <tr>
-                        <th style={{ width: "60px" }}>STT</th>
-                        <th style={{ width: "200px" }}>Từ vựng</th>
-                        <th>Định nghĩa</th>
-                        {wordSetDetail.words.some(w => w.example) && <th>Ví dụ</th>}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {wordSetDetail.words.map((word, idx) => (
-                        <tr key={word.id || idx}>
-                          <td className="text-center font-bold">{idx + 1}</td>
-                          <td className="word-name-cell">{word.name}</td>
-                          <td>{word.definition}</td>
-                          {wordSetDetail.words.some(w => w.example) && (
-                            <td className="word-example-cell">{word.example || "-"}</td>
-                          )}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  <div className="modal-words-list-header">
+                    <h3>Danh sách từ vựng ({wordSetDetail.words.length} từ)</h3>
+                    <button className="btn-toggle-all" onClick={handleToggleAllWords}>
+                      {wordSetDetail.words.every(w => expandedWordIds.has(w.id)) ? "Ẩn tất cả nghĩa" : "Hiện tất cả nghĩa"}
+                    </button>
+                  </div>
+                  <div className="words-grid">
+                    {wordSetDetail.words.map((word, idx) => {
+                      const isExpanded = expandedWordIds.has(word.id);
+                      const fontStyle = {
+                        fontSize: word.name.length > 25
+                          ? "11px"
+                          : word.name.length > 18
+                            ? "13.5px"
+                            : "16px"
+                      };
+                      return (
+                        <div
+                          key={word.id || idx}
+                          className={`word-card ${isExpanded ? "flipped" : ""}`}
+                          onClick={() => handleToggleWord(word.id)}
+                        >
+                          <div className="word-card-inner">
+                            {/* Mặt trước: Từ vựng */}
+                            <div className="word-card-front">
+                              <div className="word-card-index">{idx + 1}</div>
+                              <div className="card-face-body">
+                                <div className="word-name" style={fontStyle}>
+                                  {word.name}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Mặt sau: Nghĩa & Ví dụ */}
+                            <div className="word-card-back">
+                              <div className="card-face-body">
+                                <div className="word-definition">
+                                  {word.definition}
+                                </div>
+                                {word.example && (
+                                  <div className="word-example">
+                                    <em>{word.example}</em>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               ) : (
                 <div className="detail-empty">
