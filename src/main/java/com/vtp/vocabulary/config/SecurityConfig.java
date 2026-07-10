@@ -44,7 +44,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("http://localhost:5173","https://vocabulary-vtp-vocabulary.vercel.app"));
+        config.setAllowedOrigins(List.of("http://localhost:5173","https://vocabulary-vtp-vocabulary.vercel.app","https://www.vocabulary-vtp.id.vn"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
