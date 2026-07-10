@@ -178,7 +178,7 @@ function LibraryPage() {
 
   const handleStudy = (e, id) => {
     e.stopPropagation();
-    navigate(`/flash-card?id=${id}`);
+    navigate(`/flash-card-game?id=${id}&type=public`);
   };
 
   const handleExercise = (e, id) => {
@@ -191,7 +191,7 @@ function LibraryPage() {
     const name = set?.setName || set?.wordSetName || "";
     const desc = set?.description || "";
     return name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-           desc.toLowerCase().includes(searchQuery.toLowerCase());
+      desc.toLowerCase().includes(searchQuery.toLowerCase());
   });
 
   const handlePageChange = (newPage) => {

@@ -94,7 +94,7 @@ function MyWordSetsPage() {
       const detail = activeTab === "saved"
         ? await vocabApi.getSavedWordSetDetail(set.savedWordSetId || set.id)
         : await vocabApi.getWordSetDetail(set.id);
-      
+
       if (activeTab === "saved" && detail) {
         // Chuẩn hóa dữ liệu trả về từ backend: map learningWordResponses thành words và wordId thành id
         const rawWords = detail.learningWordResponses || detail.words || [];
@@ -103,7 +103,7 @@ function MyWordSetsPage() {
           id: w.id || w.wordId
         }));
       }
-      
+
       setWordSetDetail(detail);
     } catch (err) {
       console.error("Lỗi khi tải chi tiết bộ từ:", err);
@@ -166,7 +166,7 @@ function MyWordSetsPage() {
     let name = 'Đồng';
     let progress = 0;
     let expDisplay = "";
-    
+
     if (exp >= 435) {
       level = 5;
       color = '#a0c4ff'; // Thần thoại (Xanh pastel / Cầu vồng)
@@ -210,14 +210,15 @@ function MyWordSetsPage() {
       progress = Math.round((exp / 10) * 100);
       expDisplay = `${exp} / 10`;
     }
-    
+
     return { level, color, bg, name, progress, expDisplay };
   };
 
   const handleStudy = (e, id, savedWordSetId) => {
     e.stopPropagation();
     const queryId = savedWordSetId || id;
-    navigate(`/flash-card?id=${queryId}`);
+    const type = savedWordSetId ? "saved" : "public";
+    navigate(`/flash-card-game?id=${queryId}&type=${type}`);
   };
 
   const handleExercise = (e, id, savedWordSetId) => {
@@ -232,7 +233,7 @@ function MyWordSetsPage() {
     const name = set?.setName || set?.wordSetName || "";
     const desc = set?.description || "";
     return name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-           desc.toLowerCase().includes(searchQuery.toLowerCase());
+      desc.toLowerCase().includes(searchQuery.toLowerCase());
   }) : [];
 
   if (!isLoggedIn) {
@@ -426,11 +427,11 @@ function MyWordSetsPage() {
                             ? "13.5px"
                             : "16px"
                       };
-                      
+
                       // Tính toán EXP và Level (chỉ hiển thị khi đang ở tab bộ từ đã lưu)
                       const wordExp = activeTab === "saved" ? (word.exp !== undefined ? word.exp : getWordExp(word.id)) : 0;
                       const levelInfo = activeTab === "saved" ? getLevelInfo(wordExp) : null;
-                      
+
                       return (
                         <div
                           key={word.id || idx}
@@ -441,12 +442,12 @@ function MyWordSetsPage() {
                             {/* Mặt trước: Từ vựng & Tiến trình */}
                             <div className="word-card-front">
                               {activeTab === "saved" ? (
-                                <div 
-                                  className="word-level-badge" 
-                                  style={{ 
-                                    color: levelInfo.color, 
-                                    backgroundColor: levelInfo.bg, 
-                                    borderColor: levelInfo.color 
+                                <div
+                                  className="word-level-badge"
+                                  style={{
+                                    color: levelInfo.color,
+                                    backgroundColor: levelInfo.bg,
+                                    borderColor: levelInfo.color
                                   }}
                                   title={`EXP tích lũy của từ: ${wordExp}`}
                                 >
@@ -464,11 +465,11 @@ function MyWordSetsPage() {
                                 <div className="word-progress-section" onClick={(e) => e.stopPropagation()}>
                                   <div className="word-progress-bar-wrapper">
                                     <div className="word-progress-bar-bg">
-                                      <div 
-                                        className="word-progress-bar-fill" 
-                                        style={{ 
+                                      <div
+                                        className="word-progress-bar-fill"
+                                        style={{
                                           width: `${levelInfo.progress}%`,
-                                          backgroundColor: levelInfo.color 
+                                          backgroundColor: levelInfo.color
                                         }}
                                       />
                                     </div>
@@ -506,7 +507,7 @@ function MyWordSetsPage() {
             </div>
 
             <div className="detail-modal-footer">
-               <button className="btn-footer-study" onClick={(e) => { handleStudy(e, selectedSet.id, selectedSet.savedWordSetId); handleCloseDetail(); }}>
+              <button className="btn-footer-study" onClick={(e) => { handleStudy(e, selectedSet.id, selectedSet.savedWordSetId); handleCloseDetail(); }}>
                 Học bằng Flash Card
               </button>
               <button className="btn-footer-exercise" onClick={(e) => { handleExercise(e, selectedSet.id, selectedSet.savedWordSetId); handleCloseDetail(); }}>

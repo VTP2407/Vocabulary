@@ -16,6 +16,7 @@
   background: #cbebf2;
   border-bottom: 1.5px solid rgba(12, 166, 198, 0.15);
   box-shadow: 0 4px 20px rgba(12, 166, 198, 0.05);
+  margin-bottom: 10px;
 }
 
 .header-content {
@@ -26,7 +27,7 @@
   max-width: 1200px;
   height: 72px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 10px;
   box-sizing: border-box;
 }
 
@@ -218,9 +219,10 @@
 .app-main-content {
   flex: 1;
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  height: calc(100vh - 82px);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -308,7 +310,8 @@
   }
 
   .app-main-content {
-    padding: 16px;
+    padding: 0;
+    height: calc(100vh - 74px);
   }
 }
 

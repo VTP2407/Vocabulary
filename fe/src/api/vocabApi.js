@@ -157,6 +157,35 @@ const vocabApi = {
             params: { page, size }
         });
         return response.data;
+    },
+
+    // Gửi danh sách kết quả bài kiểm tra/luyện tập để cập nhật EXP cho các từ (không cần mã bộ từ)
+    // - Request Body (Dữ liệu gửi đi):
+    //   {
+    //      "wordUpdateRequests": [
+    //         {
+    //            "savedWordId": 10,  // ID của từ trong bộ từ đã lưu (savedWordId)
+    //            "expAdded": 2       // Số lượng EXP cộng thêm (+1 cho trắc nghiệm, +2 cho điền từ)
+    //         },
+    //         {
+    //            "savedWordId": 11,
+    //            "expAdded": 1
+    //         }
+    //      ]
+    //   }
+    //
+    // - Response (Dữ liệu nhận về):
+    //   {
+    //      "wordUpdateResponses": [
+    //         {
+    //            "savedWordId": 10,  // ID của từ trong bộ từ đã lưu
+    //            "newExp": 45        // Điểm EXP mới của từ sau khi cập nhật
+    //         }
+    //      ]
+    //   }
+    submitTestResults: async (payload) => {
+        const response = await axiosClient.post("/api/word-set/submit-results", payload);
+        return response.data;
     }
 };
 

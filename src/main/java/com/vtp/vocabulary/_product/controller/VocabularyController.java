@@ -1,9 +1,11 @@
 package com.vtp.vocabulary._product.controller;
 
+import com.vtp.vocabulary._product.service.SavedWordService;
 import com.vtp.vocabulary._product.service.SavedWordSetService;
 import com.vtp.vocabulary._product.service.WordService;
 import com.vtp.vocabulary._product.service.WordSetService;
 import com.vtp.vocabulary.dto.request.CreateSetWordRequest;
+import com.vtp.vocabulary.dto.request.ExerciseRequest;
 import com.vtp.vocabulary.dto.response.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,6 +18,7 @@ public class VocabularyController {
     private final WordService wordService;
     private final WordSetService wordSetService;
     private final SavedWordSetService savedWordSetService;
+    private final SavedWordService savedWordService;
 
     @PostMapping("/create")
     CreateWordSetResponse createWordSet(@RequestBody CreateSetWordRequest request){
@@ -64,5 +67,10 @@ public class VocabularyController {
     @GetMapping("/saved/{savedWordSetId}")
     SavedWordSetDetail getSavedWordSetDetail(@PathVariable Long savedWordSetId){
         return savedWordSetService.getSavedWordSetDetail(savedWordSetId);
+    }
+
+    @PostMapping("/submit-results")
+    ExerciseResponse updateExpAfterExercise(@RequestBody ExerciseRequest request){
+        return savedWordService.updateExpAfterExercise(request);
     }
 }

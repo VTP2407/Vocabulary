@@ -533,6 +533,7 @@ function UserLayout() {
               <BookOutlined className="nav-icon" />
               <span className="nav-text">Thư viện</span>
             </NavLink>
+            {/*
             <NavLink
               to="/friend"
               className={({ isActive }) => (isActive ? "nav-item active" : "nav-item")}
@@ -540,6 +541,7 @@ function UserLayout() {
               <TeamOutlined className="nav-icon" />
               <span className="nav-text">Bạn bè</span>
             </NavLink>
+            */}
             <NavLink
               to="/my-sets"
               className={({ isActive }) => (isActive ? "nav-item active" : "nav-item")}

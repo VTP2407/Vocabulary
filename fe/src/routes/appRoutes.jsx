@@ -7,6 +7,7 @@ import HomePage from "../pages/home/homePage";
 import LibraryPage from "../pages/library/library";
 import FriendPage from "../pages/friend/friend";
 import FlashCardPage from "../pages/flashCard/flashCard";
+import FlashCardGamePage from "../pages/flashCard/flashCardGame";
 import ExercisePage from "../pages/exercise/exercise";
 import TestPage from "../pages/test/test";
 import VocabularyPage from "../pages/vocabulary/vocabulary";
@@ -28,11 +29,12 @@ function AppRoutes() {
                     <Route path="library" element={<LibraryPage />} />
                     <Route path="friend" element={<FriendPage />} />
                     <Route path="flash-card" element={<FlashCardPage />} />
+                    <Route path="flash-card-game" element={<FlashCardGamePage />} />
                     <Route path="exercise" element={<ExercisePage />} />
                     <Route path="test" element={<TestPage />} />
                     <Route path="vocabulary" element={<VocabularyPage />} />
                     <Route path="my-sets" element={<MyWordSetsPage />} />
-                    
+
                     {/* Hỗ trợ chuyển hướng từ /user về trang chủ / */}
                     <Route path="user" element={<Navigate to="/" replace />} />
                 </Route>
