@@ -1,6 +1,6 @@
 Dự án học từ vựng tiếng anh
-link web: https://www.vocabulary-vtp.id.vn
-Chỉ hỗ trợ học từ vựng
+link web: https://www.vocabulary-vtp.id.vn .<br>
+Chỉ hỗ trợ học từ vựng <br>
 Các chức năng hiện có thể sử dụng:
   - Tạo 1 bộ từ mới, lưu bộ từ  
   - Học bằng flashcard
