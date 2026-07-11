@@ -72,4 +72,16 @@ public class WordSetService {
                 .words(words)
                 .build();
     }
+
+    @Transactional
+    public void deleteWordSet(Long wordSetId) {
+        WordSet wordSet = wordSetRepository.findById(wordSetId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.WORD_SET_NOT_FOUND));
+
+        if (!wordSet.getUserId().equals(CurrentUserUtils.getUserId())) {
+            throw new RuntimeException("Bạn không có quyền xóa bộ từ vựng này!");
+        }
+
+        wordSetRepository.delete(wordSet);
+    }
 }

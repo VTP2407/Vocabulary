@@ -59,7 +59,25 @@ function FlashCardPage() {
 
   return (
     <div className="flashcard-list-wrapper">
-
+      <div className="back-nav-container" style={{ width: "100%", display: "flex", justifyContent: "flex-start", marginBottom: "20px" }}>
+        <button
+          onClick={() => navigate("/")}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            background: "none",
+            border: "none",
+            color: "#0ca6c6",
+            fontSize: "15px",
+            fontWeight: "700",
+            cursor: "pointer",
+            padding: "0"
+          }}
+        >
+          <ArrowLeftOutlined /> Quay lại trang chủ
+        </button>
+      </div>
 
       {loading ? (
         <div className="flashcard-list-loading">

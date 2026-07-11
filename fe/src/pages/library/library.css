@@ -105,10 +105,12 @@
   overflow: hidden;
 }
 
-.library-card:hover {
-  transform: translateY(-5px);
-  border-color: rgba(12, 166, 198, 0.35);
-  box-shadow: 0 15px 35px rgba(12, 166, 198, 0.08), 0 5px 15px rgba(0, 0, 0, 0.01);
+@media (hover: hover) {
+  .library-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(12, 166, 198, 0.35);
+    box-shadow: 0 15px 35px rgba(12, 166, 198, 0.08), 0 5px 15px rgba(0, 0, 0, 0.01);
+  }
 }
 
 .card-top {
@@ -443,8 +445,10 @@
   transition: transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.word-card:hover {
-  transform: translateY(-3px);
+@media (hover: hover) {
+  .word-card:hover {
+    transform: translateY(-3px);
+  }
 }
 
 .word-card-inner {
@@ -480,10 +484,12 @@
   transition: border-color 0.25s, box-shadow 0.25s;
 }
 
-.word-card:hover .word-card-front,
-.word-card:hover .word-card-back {
-  border-color: rgba(12, 166, 198, 0.35);
-  box-shadow: 0 8px 18px rgba(12, 166, 198, 0.07);
+@media (hover: hover) {
+  .word-card:hover .word-card-front,
+  .word-card:hover .word-card-back {
+    border-color: rgba(12, 166, 198, 0.35);
+    box-shadow: 0 8px 18px rgba(12, 166, 198, 0.07);
+  }
 }
 
 /* Mặt sau có màu nền và cuộn khi nội dung quá dài */
@@ -616,12 +622,10 @@
   transition: color 0.2s;
 }
 
-.word-card:hover .word-card-action {
-  color: #0ca6c6;
-}
-
-.word-card:hover .word-card-action {
-  color: #0ca6c6;
+@media (hover: hover) {
+  .word-card:hover .word-card-action {
+    color: #0ca6c6;
+  }
 }
 
 .word-card.expanded .word-card-action {

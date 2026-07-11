@@ -132,10 +132,12 @@
   text-align: left;
 }
 
-.flashcard-set-card:hover {
-  transform: translateY(-5px);
-  border-color: rgba(12, 166, 198, 0.35);
-  box-shadow: 0 15px 35px rgba(12, 166, 198, 0.08), 0 5px 15px rgba(0, 0, 0, 0.01);
+@media (hover: hover) {
+  .flashcard-set-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(12, 166, 198, 0.35);
+    box-shadow: 0 15px 35px rgba(12, 166, 198, 0.08), 0 5px 15px rgba(0, 0, 0, 0.01);
+  }
 }
 
 .card-card-top {

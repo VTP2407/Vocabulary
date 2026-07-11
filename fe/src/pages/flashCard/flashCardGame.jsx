@@ -443,6 +443,26 @@ function FlashCardGamePage() {
 
   return (
     <div className="flashcard-page-wrapper" style={{ userSelect: isDragging ? "none" : "auto" }}>
+      <div className="back-nav-container" style={{ width: "100%", maxWidth: "600px", margin: "0 auto 16px auto", display: "flex", justifyContent: "flex-start" }}>
+        <button
+          onClick={() => navigate("/flash-card")}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            background: "none",
+            border: "none",
+            color: "#0ca6c6",
+            fontSize: "15px",
+            fontWeight: "700",
+            cursor: "pointer",
+            padding: "0"
+          }}
+        >
+          <ArrowLeftOutlined /> Quay lại danh sách bộ từ
+        </button>
+      </div>
+
       {/* Screen swipe overlays */}
       {isDragging && dragOffset.x < -10 && (
         <div 

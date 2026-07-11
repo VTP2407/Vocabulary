@@ -723,6 +723,25 @@ function ExercisePage() {
 
     return (
       <div className="gameplay-wrapper">
+        <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: "16px" }}>
+          <button
+            onClick={handleBackToSelection}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              background: "none",
+              border: "none",
+              color: "#0ca6c6",
+              fontSize: "15px",
+              fontWeight: "700",
+              cursor: "pointer",
+              padding: "0"
+            }}
+          >
+            <ArrowLeftOutlined /> Thoát luyện tập
+          </button>
+        </div>
         <div className="game-progress-container">
           <div className="game-progress-info">
             <span className="game-progress-label">Tiến trình luyện tập</span>
@@ -928,13 +947,25 @@ function ExercisePage() {
 
   return (
     <div className="exercise-container">
-      {/* Navigation Top Header (if not currently playing gameplay and not selecting words) */}
       {!isPlaying && !isFinished && !id && (
-        <div className="exercise-header">
-          <div className="exercise-header-title">
-            <h1>Luyện tập Từ vựng</h1>
-            <p>Chọn một bộ từ đã lưu từ danh sách bên dưới để bắt đầu làm bài luyện tập</p>
-          </div>
+        <div className="back-nav-container" style={{ width: "100%", display: "flex", justifyContent: "flex-start", marginBottom: "20px" }}>
+          <button
+            onClick={() => navigate("/")}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              background: "none",
+              border: "none",
+              color: "#0ca6c6",
+              fontSize: "15px",
+              fontWeight: "700",
+              cursor: "pointer",
+              padding: "0"
+            }}
+          >
+            <ArrowLeftOutlined /> Quay lại trang chủ
+          </button>
         </div>
       )}
 

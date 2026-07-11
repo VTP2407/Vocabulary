@@ -113,6 +113,20 @@ function MyWordSetsPage() {
     }
   };
 
+  const handleDeleteSet = async (e, id) => {
+    e.stopPropagation(); // Tránh kích hoạt sự kiện click của Card
+    if (!window.confirm("Bạn có chắc chắn muốn xóa vĩnh viễn bộ từ vựng này không? Hành động này không thể hoàn tác!")) return;
+
+    try {
+      await vocabApi.deleteWordSet(id);
+      alert("Xóa bộ từ vựng thành công!");
+      await fetchData();
+    } catch (err) {
+      console.error("Lỗi khi xóa bộ từ vựng:", err);
+      alert("Xóa bộ từ vựng thất bại!");
+    }
+  };
+
   const handleOpenDetail = async (set) => {
     setSelectedSet(set);
     setDetailLoading(true);
@@ -392,6 +406,15 @@ function MyWordSetsPage() {
             const description = set?.description || "Không có mô tả cho bộ từ này.";
             return (
               <div key={set?.id} className="vocab-set-card" onClick={() => handleOpenDetail(set)}>
+                {activeTab === "created" && (
+                  <button
+                    className="delete-set-btn"
+                    onClick={(e) => handleDeleteSet(e, set.id)}
+                    title="Xóa bộ từ vựng"
+                  >
+                    <CloseOutlined />
+                  </button>
+                )}
                 <div className="card-top">
                   <div className="card-badge-row">
                     <span className={`visibility-badge ${visibility.toLowerCase()}`}>

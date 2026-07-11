@@ -78,4 +78,10 @@ public class VocabularyController {
     CreateWordSetResponse updateWordSet(@PathVariable Long wordSetId, @RequestBody CreateSetWordRequest request){
         return wordService.updateWordSet(wordSetId, request);
     }
+
+    @DeleteMapping("/{wordSetId}/delete")
+    String deleteWordSet(@PathVariable Long wordSetId){
+        wordSetService.deleteWordSet(wordSetId);
+        return "Xóa bộ từ vựng thành công!";
+    }
 }

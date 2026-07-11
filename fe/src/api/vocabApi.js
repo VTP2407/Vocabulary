@@ -109,6 +109,12 @@ const vocabApi = {
         return response.data;
     },
 
+    // Xóa bộ từ vựng đã tạo
+    deleteWordSet: async (wordSetId) => {
+        const response = await axiosClient.delete(`/api/word-set/${wordSetId}/delete`);
+        return response.data;
+    },
+
     // Chi tiết bộ từ vựng (kèm các từ trong bộ từ đó)
     // - Request: GET /api/word-set/{wordSetId}
     // - Response (Kết quả trả về): Dạng PublicWordSetDetail từ Backend
