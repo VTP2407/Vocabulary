@@ -41,7 +41,4 @@ Chỉ hỗ trợ học từ vựng <br>
 - SavedWordSet 1-n SavedWord: ON DELETE CASCADE
 - Trong SavedWordSet lưu source_word-set_id và user_id để tránh lưu trùng với 1 người
 
-<Có thể sẽ phát triển thêm chức năng kiểm tra, với mỗi câu đúng +5 exp cho từ tương ứng, hoặc không!>
-
-<bye>
-<bye>
+<Có thể sẽ phát triển thêm chức năng kiểm tra, với mỗi câu đúng +5 exp cho từ tương ứng, hoặc không! :) bye>
