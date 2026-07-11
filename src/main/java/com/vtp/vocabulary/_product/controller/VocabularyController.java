@@ -73,4 +73,9 @@ public class VocabularyController {
     ExerciseResponse updateExpAfterExercise(@RequestBody ExerciseRequest request){
         return savedWordService.updateExpAfterExercise(request);
     }
+
+    @PutMapping("/{wordSetId}/update")
+    CreateWordSetResponse updateWordSet(@PathVariable Long wordSetId, @RequestBody CreateSetWordRequest request){
+        return wordService.updateWordSet(wordSetId, request);
+    }
 }

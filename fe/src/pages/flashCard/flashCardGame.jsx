@@ -48,8 +48,9 @@ function FlashCardGamePage() {
   const [isDragging, setIsDragging] = useState(false);
   const [swipeClass, setSwipeClass] = useState(""); // "", "swiped-left", "swiped-right"
 
-  // Refs for autoplay
+  // Refs for autoplay & touch event tracking
   const autoplayTimerRef = useRef(null);
+  const lastTouchTime = useRef(0);
 
   useEffect(() => {
     fetchWordSetDetail();
@@ -161,14 +162,8 @@ function FlashCardGamePage() {
         setWords(normalized);
         setOriginalWords(normalized);
 
-        // Prepopulate reviewStatus for saved words using their EXP
-        const initialStatus = {};
-        normalized.forEach(w => {
-          if (w.exp !== undefined && w.exp > 0) {
-            initialStatus[w.id] = w.exp >= 85 ? "known" : "learning";
-          }
-        });
-        setReviewStatus(initialStatus);
+        // Tạo mới tiến trình học bằng cách bắt đầu với tiến trình trống (0%)
+        setReviewStatus({});
       } else {
         setError("Không có dữ liệu trả về từ máy chủ.");
       }
@@ -320,6 +315,7 @@ function FlashCardGamePage() {
 
   // Mouse drag handlers
   const handleMouseDown = (e) => {
+    if (Date.now() - lastTouchTime.current < 500) return;
     if (e.button !== 0) return; // Only left click drag
     handleDragStart(e.clientX, e.clientY);
   };
@@ -328,15 +324,22 @@ function FlashCardGamePage() {
     handleDragMove(e.clientX, e.clientY);
   };
 
-  // Touch drag handlers for mobile
+  // Touch drag handlers for mobile (prevents scrolling and double flip triggers)
   const handleTouchStart = (e) => {
+    lastTouchTime.current = Date.now();
     const touch = e.touches[0];
     handleDragStart(touch.clientX, touch.clientY);
   };
 
   const handleTouchMove = (e) => {
+    lastTouchTime.current = Date.now();
     const touch = e.touches[0];
     handleDragMove(touch.clientX, touch.clientY);
+  };
+
+  const handleTouchEnd = (e) => {
+    lastTouchTime.current = Date.now();
+    handleDragEnd();
   };
 
   // Toggle Shuffle card list
@@ -492,13 +495,28 @@ function FlashCardGamePage() {
               onMouseLeave={handleDragEnd}
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
-              onTouchEnd={handleDragEnd}
+              onTouchEnd={handleTouchEnd}
             >
               {/* Card Face FRONT (English Word) */}
               <div className="card-face front">
                 <span className="card-label">Thuật ngữ tiếng Anh</span>
                 <div className="card-main-content">
                   <div className="word-title">{currentWord?.name}</div>
+                  <button
+                    className="btn-tts-speak"
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onTouchStart={(e) => {
+                      e.stopPropagation();
+                      lastTouchTime.current = Date.now();
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      speakWord(currentWord?.name);
+                    }}
+                    title="Phát âm từ vựng"
+                  >
+                    <SoundOutlined />
+                  </button>
                 </div>
                 <div className="card-hint">Kéo TRÁI = Chưa thuộc • Kéo PHẢI = Đã thuộc • Nhấp để lật</div>
               </div>
@@ -513,6 +531,21 @@ function FlashCardGamePage() {
                       "{currentWord.example}"
                     </div>
                   )}
+                  <button
+                    className="btn-tts-speak back-speak"
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onTouchStart={(e) => {
+                      e.stopPropagation();
+                      lastTouchTime.current = Date.now();
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      speakWord(currentWord?.name);
+                    }}
+                    title="Phát âm từ vựng"
+                  >
+                    <SoundOutlined />
+                  </button>
                 </div>
                 <div className="card-hint">Kéo TRÁI = Chưa thuộc • Kéo PHẢI = Đã thuộc • Nhấp để lật</div>
               </div>
@@ -532,13 +565,6 @@ function FlashCardGamePage() {
                 ) : (
                   <><PlayCircleOutlined /> Tự động chạy</>
                 )}
-              </button>
-              <button
-                className={`btn-ctrl ${isShuffle ? "active" : ""}`}
-                onClick={handleToggleShuffle}
-                title="Tráo thứ tự các thẻ từ"
-              >
-                <SwapOutlined /> Tráo thẻ
               </button>
             </div>
             <button className="btn-ctrl" onClick={handleResetLearning}>

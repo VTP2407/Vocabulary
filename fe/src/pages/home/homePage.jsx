@@ -21,7 +21,7 @@ function HomePage() {
         <div className="illustration-center-container">
           {/* Left flying book */}
           <img src={pageIcon} alt="Decor Book Left" className="decor-img decor-book-left" />
-          
+
           {/* Main Mascot Owl */}
           <div className="mascot-wrapper">
             <img src={helloOwlImg} alt="Hello Owl Mascot" className="main-mascot" />

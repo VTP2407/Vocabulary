@@ -51,7 +51,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 24px;
+  padding: 10px 20px;
   background: linear-gradient(135deg, #0ca6c6 0%, #0b8fa8 100%);
   color: #ffffff;
   font-weight: 750;
@@ -84,6 +84,13 @@
   box-shadow: 0 10px 25px rgba(12, 166, 198, 0.04);
   flex-wrap: wrap;
   gap: 20px;
+}
+
+.controls-right-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 /* Tabs */
@@ -153,7 +160,6 @@
   font-size: 16px;
 }
 
-/* Grid của bộ từ */
 .my-vocab-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -251,6 +257,7 @@
 /* Nút hành động trong Card */
 .card-actions {
   display: flex;
+  justify-content: center;
   gap: 8px;
   border-top: 1.5px solid rgba(12, 166, 198, 0.06);
   padding-top: 16px;
@@ -268,6 +275,11 @@
   border: none;
   text-align: center;
   box-sizing: border-box;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }
 
 .btn-study {
@@ -296,11 +308,6 @@
   background: #fff5f5;
   color: #e11d48;
   border: 1px solid rgba(225, 29, 72, 0.15);
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: auto;
 }
 
 .btn-unsave:hover {
@@ -1014,51 +1021,27 @@
   border-radius: 16px;
   border: 2px solid currentColor;
   background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  color: #ffffff;
   transition: all 0.3s ease;
 }
 
-/* Định vị level badge hình tròn ở góc dưới bên phải */
-.word-card.has-level .word-level-badge {
-  position: absolute;
-  bottom: -1px;
-  right: -1px;
-  top: auto;
-  left: auto;
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
-  background: #ffffff;
-  border: 2.5px solid currentColor;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  font-weight: 800;
-  color: currentColor;
-  z-index: 10;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-}
-
-/* Container cho thanh tiến trình EXP sát phía dưới (nhỏ như ban đầu) */
+/* Container cho thanh tiến trình EXP sát phía dưới */
 .word-card.has-level .word-progress-section {
   position: absolute;
   bottom: 10px;
   left: 10px;
-  right: 32px;
-  /* Chừa chỗ cho level badge ở góc dưới phải */
+  right: 10px;
+  width: auto;
   z-index: 5;
   box-sizing: border-box;
   padding: 0;
-  /* Bỏ padding thừa kế */
   margin: 0;
-  /* Bỏ margin thừa */
 }
 
 .word-card.has-level .word-progress-bar-wrapper {
   display: flex;
   align-items: center;
   gap: 6px;
+  width: 100%;
 }
 
 .word-card.has-level .word-progress-bar-bg {
@@ -1105,69 +1088,80 @@
   color: #94a3b8;
 }
 
-.word-card.has-level.level-0 .word-card-front {
-  background-color: #ffffff;
-}
-
 .word-card.has-level.level-0 .word-card-back {
   background: #f8fafc;
 }
 
+.word-card.has-level.level-0 .word-card-front {
+  background-color: #ffffff;
+}
+
+
+
 /* Level 1: Green/Teal */
 .word-card.has-level.level-1 {
-  color: #66bb6a;
+  color: #47f150;
+}
+
+.word-card.has-level.level-1 .word-card-back {
+  background: rgba(35, 252, 46, 0.096);
 }
 
 .word-card.has-level.level-1 .word-card-front {
   background-color: #ffffff;
 }
 
-.word-card.has-level.level-1 .word-card-back {
-  background: #f0fdf4;
-}
+
 
 /* Level 2: Blue */
 .word-card.has-level.level-2 {
   color: #42a5f5;
 }
 
+.word-card.has-level.level-2 .word-card-back {
+  background: rgba(66, 164, 245, 0.116);
+}
+
 .word-card.has-level.level-2 .word-card-front {
   background-color: #ffffff;
 }
 
-.word-card.has-level.level-2 .word-card-back {
-  background: #eff6ff;
-}
+
 
 /* Level 3: Purple */
 .word-card.has-level.level-3 {
   color: #ba68c8;
 }
 
-.word-card.has-level.level-3 .word-card-front {
-  background-color: #ffffff;
-}
-
 .word-card.has-level.level-3 .word-card-back {
   background: #faf5ff;
 }
 
+.word-card.has-level.level-3 .word-card-front {
+  background-color: #ffffff;
+}
+
+
+
 /* Level 4: Orange/Amber */
 .word-card.has-level.level-4 {
-  color: #ff9800;
+  color: #eb2f48;
+}
+
+.word-card.has-level.level-4 .word-card-back {
+  background: rgba(235, 47, 72, 0.05);
 }
 
 .word-card.has-level.level-4 .word-card-front {
   background-color: #ffffff;
 }
 
-.word-card.has-level.level-4 .word-card-back {
-  background: #fff7ed;
-}
+
 
 /* Level 5: Red (Mythic) -> Rainbow Cầu vồng dạng Gradient! */
 .word-card.has-level.level-5 {
-  color: #a0c4ff; /* Nhạt hơn */
+  color: #a0c4ff;
+  /* Nhạt hơn */
 }
 
 .word-card.has-level.level-5 .word-card-front {
@@ -1179,21 +1173,25 @@
 
 .word-card.has-level.level-5 .word-card-back {
   border: 2px solid transparent;
-  background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(90deg, #ffadad, #ffd6a5, #fdffb6, #caffbf, #9bf6ff, #a0c4ff, #bdb2ff, #ffc6ff, #ffadad);
-  background-origin: border-box;
-  background-clip: padding-box, border-box;
+  background-image: 
+    linear-gradient(90deg, rgba(255, 173, 173, 0.3), rgba(255, 214, 165, 0.3), rgba(253, 255, 182, 0.3), rgba(202, 255, 191, 0.3), rgba(155, 246, 255, 0.3), rgba(160, 196, 255, 0.3), rgba(189, 178, 255, 0.3), rgba(255, 198, 255, 0.3), rgba(255, 173, 173, 0.3)), 
+    linear-gradient(#ffffff, #ffffff),
+    linear-gradient(90deg, #ffadad, #ffd6a5, #fdffb6, #caffbf, #9bf6ff, #a0c4ff, #bdb2ff, #ffc6ff, #ffadad);
+  background-origin: padding-box, padding-box, border-box;
+  background-clip: padding-box, padding-box, border-box;
 }
 
 .word-card.has-level.level-5 .word-level-badge {
-  border: 2.5px solid transparent;
-  background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(135deg, #ffadad, #ffd6a5, #caffbf, #a0c4ff, #bdb2ff);
-  background-origin: border-box;
-  background-clip: padding-box, border-box;
-  color: #7b88ff; /* Chữ số 5 có màu tím pastel đậm dễ nhìn */
+  border: 2.5px solid transparent !important;
+  background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(135deg, #ffadad, #ffd6a5, #caffbf, #a0c4ff, #bdb2ff) !important;
+  background-origin: border-box !important;
+  background-clip: padding-box, border-box !important;
+  color: #7b88ff !important;
+  /* Chữ số 5 có màu tím pastel đậm dễ nhìn */
 }
 
 .word-card.has-level.level-5 .word-progress-bar-fill {
-  background: linear-gradient(90deg, #ffadad, #ffd6a5, #fdffb6, #caffbf, #9bf6ff, #a0c4ff, #bdb2ff);
+  background: linear-gradient(90deg, #ffadadc2, #ffd6a5af, #fdffb6c4, #caffbfa1, #9bf6ff, #a0c4ffa8, #beb2ffb6);
 }
 
 /* Back face styling overrides inside has-level cards */
@@ -1209,4 +1207,79 @@
   border-left-color: currentColor;
   font-size: 11.5px;
   padding-left: 8px;
+}
+
+/* Nút Sửa trong card */
+.btn-edit {
+  background: #f0fdfd;
+  color: #0b4c5c;
+  border: 1px solid rgba(11, 76, 92, 0.2);
+}
+
+.btn-edit:hover {
+  background: #0b4c5c;
+  color: #ffffff;
+}
+
+/* Nút Chỉnh sửa bộ từ ở footer modal */
+.btn-footer-edit {
+  padding: 10px 20px;
+  background: #0b4c5c;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13.5px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-footer-edit:hover {
+  background: #08333e;
+}
+
+/* Nút Bỏ lưu bộ từ ở footer modal */
+.btn-footer-unsave {
+  padding: 10px 20px;
+  background: #e11d48;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13.5px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-footer-unsave:hover {
+  background: #be123c;
+}
+
+/* Nút Lưu trong card */
+.btn-save {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.btn-save:hover {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+/* Nút Lưu bộ từ ở footer modal */
+.btn-footer-save {
+  padding: 10px 20px;
+  background: #16a34a;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13.5px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-footer-save:hover {
+  background: #15803d;
 }

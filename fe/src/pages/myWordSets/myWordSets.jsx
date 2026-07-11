@@ -47,6 +47,32 @@ function MyWordSetsPage() {
     }
   }, [activeTab]);
 
+  const fetchSavedSetsOnly = async () => {
+    try {
+      const data = await vocabApi.getSavedWordSets();
+      const listData = data && (data.content || data);
+      setSavedSets(Array.isArray(listData) ? listData : []);
+    } catch (err) {
+      console.error("Lỗi khi tải bộ từ đã lưu phụ trợ:", err);
+    }
+  };
+
+  const checkIsSaved = (setId) => {
+    return savedSets.some(s => s.id === setId);
+  };
+
+  const handleSave = async (e, wordSetId) => {
+    e.stopPropagation();
+    try {
+      await vocabApi.saveWordSet(wordSetId);
+      await fetchSavedSetsOnly();
+      alert("Lưu bộ từ vựng vào Tiến trình học thành công!");
+    } catch (err) {
+      console.error("Lỗi khi lưu bộ từ:", err);
+      alert("Lưu bộ từ thất bại!");
+    }
+  };
+
   const fetchData = async (tab = activeTab) => {
     setLoading(true);
     setError(null);
@@ -55,6 +81,8 @@ function MyWordSetsPage() {
         const data = await vocabApi.getMyWordSet();
         const listData = data && (data.content || data);
         setPersonalSets(Array.isArray(listData) ? listData : []);
+        // Also fetch saved sets to check saved status of created sets
+        await fetchSavedSetsOnly();
       } else {
         const data = await vocabApi.getSavedWordSets();
         const listData = data && (data.content || data);
@@ -96,12 +124,27 @@ function MyWordSetsPage() {
         : await vocabApi.getWordSetDetail(set.id);
 
       if (activeTab === "saved" && detail) {
-        // Chuẩn hóa dữ liệu trả về từ backend: map learningWordResponses thành words và wordId thành id
+        // Chuẩn hóa dữ liệu trả về từ backend và sắp xếp theo tiến trình học
         const rawWords = detail.learningWordResponses || detail.words || [];
-        detail.words = rawWords.map(w => ({
-          ...w,
-          id: w.id || w.wordId
-        }));
+        const normalized = rawWords.map(w => {
+          const wId = w.id || w.wordId;
+          const exp = (w.exp !== undefined && w.exp !== null) ? Number(w.exp) : Number(getWordExp(wId) || 0);
+          return {
+            ...w,
+            id: wId,
+            exp
+          };
+        });
+
+        // Sắp xếp: EXP từ thấp lên trên (chưa học), EXP cao xuống dưới (đã học)
+        normalized.sort((a, b) => {
+          if (a.exp !== b.exp) {
+            return a.exp - b.exp;
+          }
+          return a.name.localeCompare(b.name, "en", { sensitivity: "base" });
+        });
+
+        detail.words = normalized;
       }
 
       setWordSetDetail(detail);
@@ -176,8 +219,8 @@ function MyWordSetsPage() {
       expDisplay = `${exp}`;
     } else if (exp >= 185) {
       level = 4;
-      color = '#ff9800'; // Kim cương (Cam Pastel)
-      bg = '#fff7ed';
+      color = '#eb2f48'; // Kim cương (Hồng/Đỏ Pastel)
+      bg = 'rgba(235, 47, 72, 0.05)';
       name = 'Kim cương';
       progress = Math.round(((exp - 185) / 250) * 100);
       expDisplay = `${exp} / 435`;
@@ -224,7 +267,8 @@ function MyWordSetsPage() {
   const handleExercise = (e, id, savedWordSetId) => {
     e.stopPropagation();
     const queryId = savedWordSetId || id;
-    navigate(`/exercise?id=${queryId}`);
+    const type = savedWordSetId ? "saved" : "public";
+    navigate(`/exercise?id=${queryId}&type=${type}`);
   };
 
   // Lọc bộ từ theo tìm kiếm
@@ -253,19 +297,6 @@ function MyWordSetsPage() {
 
   return (
     <div className="my-vocab-page-wrapper">
-      {/* Tiêu đề & Mô tả */}
-      <div className="my-vocab-header">
-        <div className="header-text-section">
-          <h1>Bộ từ của tôi</h1>
-          <p>Quản lý và ôn tập các bộ từ vựng cá nhân của riêng bạn hoặc các bộ từ bạn đã lưu</p>
-        </div>
-        {activeTab === "created" && (
-          <button className="btn-create-set" onClick={() => navigate("/vocabulary")}>
-            <PlusOutlined /> Tạo bộ từ mới
-          </button>
-        )}
-      </div>
-
       {/* Bộ điều khiển (Nút bấm chuyển đổi & Thanh tìm kiếm) */}
       <div className="my-vocab-controls">
         <div className="tab-buttons-group">
@@ -291,14 +322,21 @@ function MyWordSetsPage() {
           </button>
         </div>
 
-        <div className="search-bar-wrapper">
-          <SearchOutlined className="search-icon" />
-          <input
-            type="text"
-            placeholder="Tìm kiếm bộ từ..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+        <div className="controls-right-section">
+          <div className="search-bar-wrapper">
+            <SearchOutlined className="search-icon" />
+            <input
+              type="text"
+              placeholder="Tìm kiếm bộ từ..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          {activeTab === "created" && (
+            <button className="btn-create-set" onClick={() => navigate("/vocabulary")}>
+              <PlusOutlined /> Tạo bộ từ mới
+            </button>
+          )}
         </div>
       </div>
 
@@ -359,13 +397,42 @@ function MyWordSetsPage() {
                 </div>
 
                 <div className="card-actions">
-                  <button className="btn-action btn-study" onClick={(e) => handleStudy(e, set.id, set.savedWordSetId)}>
-                    Học ngay
-                  </button>
-                  <button className="btn-action btn-exercise" onClick={(e) => handleExercise(e, set.id, set.savedWordSetId)}>
-                    Luyện tập
-                  </button>
-                  {activeTab === "saved" && (
+                  {activeTab === "created" ? (
+                    <>
+                      <button
+                        className="btn-action btn-edit"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/vocabulary?id=${set.id}`, {
+                            state: {
+                              setName: set.setName || set.wordSetName,
+                              description: set.description,
+                              visibility: set.visibility
+                            }
+                          });
+                        }}
+                      >
+                        Sửa
+                      </button>
+                      {checkIsSaved(set.id) ? (
+                        <button
+                          className="btn-action btn-unsave"
+                          onClick={(e) => handleUnsave(e, set.id)}
+                          title="Bỏ lưu bộ từ"
+                        >
+                          <DeleteOutlined /> Bỏ lưu
+                        </button>
+                      ) : (
+                        <button
+                          className="btn-action btn-save"
+                          onClick={(e) => handleSave(e, set.id)}
+                          title="Lưu bộ từ"
+                        >
+                          Lưu
+                        </button>
+                      )}
+                    </>
+                  ) : (
                     <button
                       className="btn-action btn-unsave"
                       onClick={(e) => handleUnsave(e, set.id)}
@@ -507,12 +574,67 @@ function MyWordSetsPage() {
             </div>
 
             <div className="detail-modal-footer">
-              <button className="btn-footer-study" onClick={(e) => { handleStudy(e, selectedSet.id, selectedSet.savedWordSetId); handleCloseDetail(); }}>
-                Học bằng Flash Card
-              </button>
-              <button className="btn-footer-exercise" onClick={(e) => { handleExercise(e, selectedSet.id, selectedSet.savedWordSetId); handleCloseDetail(); }}>
-                Luyện tập bài tập
-              </button>
+              {activeTab === "created" ? (
+                <>
+                  <button
+                    className="btn-footer-edit"
+                    onClick={() => {
+                      navigate(`/vocabulary?id=${selectedSet.id}`, {
+                        state: {
+                          setName: selectedSet.setName || selectedSet.wordSetName,
+                          description: selectedSet.description,
+                          visibility: selectedSet.visibility
+                        }
+                      });
+                      handleCloseDetail();
+                    }}
+                  >
+                    Chỉnh sửa bộ từ
+                  </button>
+                  {checkIsSaved(selectedSet.id) ? (
+                    <button
+                      className="btn-footer-unsave"
+                      onClick={(e) => {
+                        handleUnsave(e, selectedSet.id);
+                        handleCloseDetail();
+                      }}
+                    >
+                      Bỏ lưu bộ từ
+                    </button>
+                  ) : (
+                    <button
+                      className="btn-footer-save"
+                      onClick={(e) => {
+                        handleSave(e, selectedSet.id);
+                        handleCloseDetail();
+                      }}
+                    >
+                      Lưu bộ từ
+                    </button>
+                  )}
+                </>
+              ) : (
+                <>
+                  <button
+                    className="btn-footer-study"
+                    onClick={(e) => {
+                      handleStudy(e, selectedSet.id, selectedSet.savedWordSetId || selectedSet.id);
+                      handleCloseDetail();
+                    }}
+                  >
+                    flashCard
+                  </button>
+                  <button
+                    className="btn-footer-exercise"
+                    onClick={(e) => {
+                      handleExercise(e, selectedSet.id, selectedSet.savedWordSetId || selectedSet.id);
+                      handleCloseDetail();
+                    }}
+                  >
+                    Luyện tập
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>

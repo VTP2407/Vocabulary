@@ -181,7 +181,7 @@
 
 .btn-action {
   flex: 1;
-  padding: 8px 12px;
+  padding: 8px 10px;
   font-size: 13px;
   font-weight: 700;
   border-radius: 8px;
@@ -190,6 +190,11 @@
   border: none;
   text-align: center;
   box-sizing: border-box;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }
 
 .btn-study {
@@ -218,11 +223,6 @@
   background: #fffbeb;
   color: #d97706;
   border: 1px solid rgba(217, 119, 6, 0.15);
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
 }
 
 .btn-bookmark:hover {
@@ -230,11 +230,15 @@
   color: #b45309;
 }
 
-.btn-bookmark.saved {
-  background: #fef08a;
-  color: #a16207;
-  border-color: rgba(161, 98, 7, 0.25);
-  cursor: not-allowed;
+.btn-unsave {
+  background: #fff5f5;
+  color: #e11d48;
+  border: 1px solid rgba(225, 29, 72, 0.15);
+}
+
+.btn-unsave:hover {
+  background: #e11d48;
+  color: #ffffff;
 }
 
 /* Pagination (Bộ chuyển trang) */

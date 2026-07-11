@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import {
   PlusOutlined,
   MinusOutlined,
@@ -20,9 +20,13 @@ import "./vocabulary.css";
 
 function VocabularyPage() {
   const navigate = useNavigate();
-  const [setName, setSetName] = useState("");
-  const [description, setDescription] = useState("");
-  const [visibility, setVisibility] = useState("PUBLIC");
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get("id");
+  const location = useLocation();
+
+  const [setName, setSetName] = useState(location.state?.setName || "");
+  const [description, setDescription] = useState(location.state?.description || "");
+  const [visibility, setVisibility] = useState(location.state?.visibility || "PUBLIC");
   
   // Khởi tạo danh sách từ với 3 dòng trống ban đầu để người dùng dễ nhập liệu
   const [words, setWords] = useState([
@@ -35,6 +39,38 @@ function VocabularyPage() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [alert, setAlert] = useState({ type: "", text: "" });
+
+  useEffect(() => {
+    if (editId) {
+      loadEditData();
+    }
+  }, [editId]);
+
+  const loadEditData = async () => {
+    setIsSaving(true);
+    setAlert({ type: "", text: "" });
+    try {
+      const detail = await vocabApi.getWordSetDetail(editId);
+      if (detail) {
+        setSetName(detail.setName || location.state?.setName || "");
+        setDescription(detail.description || location.state?.description || "");
+        setVisibility(detail.visibility || location.state?.visibility || "PUBLIC");
+        if (detail.words && detail.words.length > 0) {
+          setWords(detail.words.map((w, idx) => ({
+            id: w.id || idx,
+            name: w.name || "",
+            definition: w.definition || "",
+            example: w.example || ""
+          })));
+        }
+      }
+    } catch (err) {
+      console.error("Lỗi khi tải thông tin bộ từ để chỉnh sửa:", err);
+      setAlert({ type: "error", text: "Không thể tải thông tin bộ từ vựng để chỉnh sửa!" });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   // Hàm thêm một hàng nhập từ mới
   const handleAddWord = () => {
@@ -127,25 +163,32 @@ function VocabularyPage() {
 
     setIsSaving(true);
     try {
-      await vocabApi.createWordSet(payload);
-      setAlert({ type: "success", text: "Tạo bộ từ vựng mới thành công! Đang chuyển về bộ từ của tôi..." });
+      if (editId) {
+        await vocabApi.updateWordSet(editId, payload);
+        setAlert({ type: "success", text: "Chỉnh sửa bộ từ vựng thành công! Đang chuyển về bộ từ của tôi..." });
+      } else {
+        await vocabApi.createWordSet(payload);
+        setAlert({ type: "success", text: "Tạo bộ từ vựng mới thành công! Đang chuyển về bộ từ của tôi..." });
+      }
       
       // Reset form
-      setSetName("");
-      setDescription("");
-      setWords([
-        { id: 1, name: "", definition: "", example: "" },
-        { id: 2, name: "", definition: "", example: "" },
-        { id: 3, name: "", definition: "", example: "" }
-      ]);
+      if (!editId) {
+        setSetName("");
+        setDescription("");
+        setWords([
+          { id: 1, name: "", definition: "", example: "" },
+          { id: 2, name: "", definition: "", example: "" },
+          { id: 3, name: "", definition: "", example: "" }
+        ]);
+      }
 
       // Chuyển hướng về trang bộ từ của tôi sau 2 giây
       setTimeout(() => {
         navigate("/my-sets");
       }, 2000);
     } catch (error) {
-      console.error("Lỗi khi tạo bộ từ vựng:", error);
-      const errorMsg = error.response?.data?.message || error.message || "Đã xảy ra lỗi khi tạo bộ từ vựng. Vui lòng thử lại!";
+      console.error(editId ? "Lỗi khi chỉnh sửa bộ từ vựng:" : "Lỗi khi tạo bộ từ vựng:", error);
+      const errorMsg = error.response?.data?.message || error.message || (editId ? "Đã xảy ra lỗi khi chỉnh sửa bộ từ vựng. Vui lòng thử lại!" : "Đã xảy ra lỗi khi tạo bộ từ vựng. Vui lòng thử lại!");
       setAlert({ type: "error", text: `Lỗi: ${errorMsg}` });
     } finally {
       setIsSaving(false);
@@ -156,8 +199,8 @@ function VocabularyPage() {
     <div className="vocab-page-container">
       {/* Tiêu đề trang */}
       <div className="vocab-page-header">
-        <h1 className="vocab-title">Tạo Bộ Từ Vựng Mới</h1>
-        <p className="vocab-subtitle">Xây dựng bộ thẻ từ thông minh theo chủ đề của riêng bạn</p>
+        <h1 className="vocab-title">{editId ? "Chỉnh sửa Bộ Từ Vựng" : "Tạo Bộ Từ Vựng Mới"}</h1>
+        <p className="vocab-subtitle">{editId ? "Cập nhật thông tin và danh sách từ vựng của bạn" : "Xây dựng bộ thẻ từ thông minh theo chủ đề của riêng bạn"}</p>
       </div>
 
       {/* Hiển thị Alert thông báo */}
@@ -396,6 +439,8 @@ function VocabularyPage() {
               <>
                 <LoadingOutlined /> Đang xử lý...
               </>
+            ) : editId ? (
+              "Lưu thay đổi"
             ) : (
               "Tạo bộ từ vựng"
             )}

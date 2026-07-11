@@ -8,6 +8,8 @@ import com.vtp.vocabulary.auth.config.CurrentUserUtils;
 import com.vtp.vocabulary.dto.request.CreateSetWordRequest;
 import com.vtp.vocabulary.dto.response.CreateWordSetResponse;
 import com.vtp.vocabulary.dto.response.WordResponse;
+import com.vtp.vocabulary.exception.BusinessException;
+import com.vtp.vocabulary.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,4 +62,50 @@ public class WordService{
                 .wordSetResponses(wordResponses)
                 .build();
     }
+
+    @Transactional
+    public CreateWordSetResponse updateWordSet(Long wordSetId, CreateSetWordRequest request) {
+        WordSet wordSet = wordSetRepository.findById(wordSetId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.WORD_SET_NOT_FOUND));
+
+        if (!wordSet.getUserId().equals(CurrentUserUtils.getUserId())) {
+            throw new RuntimeException("Không phải chủ thì đừng động vào");
+        }
+
+        wordSet.setSetName(request.getSetName());
+        wordSet.setDescription(request.getDescription());
+        wordSet.setVisibility(request.getVisibility());
+
+        wordSet.getWords().clear();
+
+        request.getWords().forEach(wordRequest -> {
+            Word word = Word.builder()
+                    .name(wordRequest.getName())
+                    .definition(wordRequest.getDefinition())
+                    .example(wordRequest.getExample())
+                    .build();
+            wordSet.addWord(word);
+        });
+
+        WordSet savedWordSet = wordSetRepository.save(wordSet);
+
+        List<WordResponse> wordResponses = savedWordSet.getWords().stream()
+                .map(word -> WordResponse.builder()
+                        .id(word.getId())
+                        .name(word.getName())
+                        .definition(word.getDefinition())
+                        .example(word.getExample())
+                        .build()
+                )
+                .toList();
+
+        return CreateWordSetResponse.builder()
+                .id(savedWordSet.getId())
+                .setName(savedWordSet.getSetName())
+                .description(savedWordSet.getDescription())
+                .visibility(savedWordSet.getVisibility())
+                .wordSetResponses(wordResponses)
+                .build();
+    }
+
 }

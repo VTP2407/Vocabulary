@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import {
   BookOutlined,
@@ -24,7 +24,8 @@ function ExercisePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const id = searchParams.get("id");
-
+  const type = searchParams.get("type");
+  const inputRef = useRef(null);
   // --- State 1: Word Sets List View ---
   const [savedSets, setSavedSets] = useState([]);
   const [setsLoading, setSetsLoading] = useState(false);
@@ -50,6 +51,7 @@ function ExercisePage() {
   const [inputValue, setInputValue] = useState(""); // for Fill-in-the-blank
   const [isAnswered, setIsAnswered] = useState(false);
   const [isCurrentAnswerCorrect, setIsCurrentAnswerCorrect] = useState(false);
+  const [learningMode, setLearningMode] = useState("mc");
 
   // --- State 4: Results Summary ---
   const [isFinished, setIsFinished] = useState(false);
@@ -83,7 +85,7 @@ function ExercisePage() {
       setIsPlaying(false);
       setIsFinished(false);
     }
-  }, [id]);
+  }, [id, type]);
 
   // --- API Handlers ---
   const fetchSavedSets = async (page) => {
@@ -108,20 +110,43 @@ function ExercisePage() {
     setDetailError(null);
     try {
       let detail;
-      try {
+      if (type === "saved") {
         detail = await vocabApi.getSavedWordSetDetail(setId);
-      } catch (savedError) {
-        console.warn("Could not load saved word set detail, trying public set detail...", savedError);
+      } else if (type === "public") {
         detail = await vocabApi.getWordSetDetail(setId);
+      } else {
+        // Fallback for URLs without explicit type param
+        try {
+          detail = await vocabApi.getSavedWordSetDetail(setId);
+        } catch (savedError) {
+          console.warn("Could not load saved word set detail, trying public set detail...", savedError);
+          detail = await vocabApi.getWordSetDetail(setId);
+        }
       }
 
       if (detail) {
         setSetName(detail.setName || "Bộ từ vựng");
         const rawWords = detail.learningWordResponses || detail.words || [];
-        const normalized = rawWords.map((w) => ({
-          ...w,
-          id: w.id || w.wordId
-        }));
+        const normalized = rawWords.map((w) => {
+          const wId = w.id || w.wordId;
+          const exp = w.exp !== undefined ? w.exp : getWordExp(wId);
+          return {
+            ...w,
+            id: wId,
+            exp
+          };
+        });
+
+        // Sắp xếp: Ưu tiên EXP thấp lên trên (tăng dần), sau đó theo bảng chữ cái A-Z
+        normalized.sort((a, b) => {
+          const expA = Number(a.exp) || 0;
+          const expB = Number(b.exp) || 0;
+          if (expA !== expB) {
+            return expA - expB; // EXP thấp lên trên, EXP cao xuống dưới
+          }
+          return a.name.localeCompare(b.name, "en", { sensitivity: "base" });
+        });
+
         setWords(normalized);
         // Set default to deselect all (empty selection)
         setSelectedWordIds(new Set());
@@ -166,8 +191,8 @@ function ExercisePage() {
       expDisplay = `${exp}`;
     } else if (exp >= 185) {
       level = 4;
-      color = "#ff9800"; // Diamond/Orange
-      bg = "#fff7ed";
+      color = "#eb2f48"; // Diamond/Pink
+      bg = "rgba(235, 47, 72, 0.05)";
       name = "Kim cương";
       progress = Math.round(((exp - 185) / 250) * 100);
       expDisplay = `${exp} / 435`;
@@ -238,7 +263,7 @@ function ExercisePage() {
   };
 
   // --- Question Generation & Game Setup ---
-  const handleStartLearning = () => {
+  const handleStartLearning = (mode) => {
     if (selectedWordIds.size === 0) return;
 
     const selectedWords = words.filter((w) => selectedWordIds.has(w.id));
@@ -295,26 +320,22 @@ function ExercisePage() {
       };
     };
 
-    if (selectedWords.length === 1) {
-      // If only 1 word selected, generate 2 MCQ and 2 FITB questions for it
-      const singleWord = selectedWords[0];
-      generatedQuestions.push(createMcqQuestion(singleWord));
-      generatedQuestions.push(createMcqQuestion(singleWord)); // Will have different shuffled distractors/positions
-      generatedQuestions.push(createFitbQuestion(singleWord));
-      generatedQuestions.push(createFitbQuestion(singleWord));
-    } else {
-      // If 2 or more words selected, generate 1 MCQ and 1 FITB question for each word
-      // This naturally guarantees at least 2 MCQ and 2 FITB questions
-      selectedWords.forEach((word) => {
+    // Generate exactly 2 questions per selected word of the chosen mode
+    selectedWords.forEach((word) => {
+      if (mode === "mc") {
         generatedQuestions.push(createMcqQuestion(word));
+        generatedQuestions.push(createMcqQuestion(word));
+      } else {
         generatedQuestions.push(createFitbQuestion(word));
-      });
-    }
+        generatedQuestions.push(createFitbQuestion(word));
+      }
+    });
 
-    // Shuffle the final list of questions so MC and FITB are mixed
+    // Shuffle the final list of questions
     const shuffledQuestions = generatedQuestions.sort(() => Math.random() - 0.5);
 
     setQuestions(shuffledQuestions);
+    setLearningMode(mode);
     setCurrentQuestionIndex(0);
     setSelectedOption(null);
     setInputValue("");
@@ -426,9 +447,52 @@ function ExercisePage() {
     }
   };
 
+  useEffect(() => {
+    if (!isPlaying || !isAnswered) return;
+
+    const handleGlobalTrigger = (e) => {
+      // Bỏ qua nếu bấm vào nút phát âm thanh
+      const audioBtn = document.querySelector(".question-audio-btn");
+      if (audioBtn && audioBtn.contains(e.target)) {
+        return;
+      }
+
+      if (e.type === "keydown" && e.key !== "Enter") {
+        return;
+      }
+
+      handleNextQuestion();
+    };
+
+    // Đăng ký sự kiện sau 150ms để tránh việc click chọn đáp án/nút check trước đó bùng nổ chuyển câu ngay
+    const timer = setTimeout(() => {
+      window.addEventListener("click", handleGlobalTrigger);
+      window.addEventListener("keydown", handleGlobalTrigger);
+    }, 150);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("click", handleGlobalTrigger);
+      window.removeEventListener("keydown", handleGlobalTrigger);
+    };
+  }, [isPlaying, isAnswered, handleNextQuestion]);
+
+  // Tự động focus vào ô input khi chuyển sang câu điền từ mới
+  useEffect(() => {
+    if (isPlaying && !isAnswered && !isFinished && questions.length > 0) {
+      const currentQ = questions[currentQuestionIndex];
+      if (currentQ && currentQ.type === "fitb" && inputRef.current) {
+        const timer = setTimeout(() => {
+          inputRef.current?.focus();
+        }, 50);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isPlaying, isAnswered, isFinished, currentQuestionIndex, questions]);
+
   // --- Reset & Back Handlers ---
   const handleRetrySameWords = () => {
-    handleStartLearning();
+    handleStartLearning(learningMode);
   };
 
   const handleBackToSelection = () => {
@@ -490,7 +554,7 @@ function ExercisePage() {
             const setId = set.savedWordSetId || set.id;
 
             return (
-              <div key={setId} className="exercise-set-card" onClick={() => setSearchParams({ id: setId })}>
+              <div key={setId} className="exercise-set-card" onClick={() => setSearchParams({ id: setId, type: "saved" })}>
                 <div className="set-card-top">
                   <div className="set-card-header">
                     <span className="word-count-tag">
@@ -560,6 +624,9 @@ function ExercisePage() {
       <div className="selection-view-container">
         <div className="selection-dashboard">
           <div className="dashboard-meta">
+            <button className="btn-back-arrow" onClick={handleBackToList} title="Quay lại">
+              <ArrowLeftOutlined />
+            </button>
             <h2>{setName}</h2>
             <p>Chọn các từ vựng bạn muốn đưa vào bài làm luyện tập. Nhấn vào thẻ từ để bật/tắt lựa chọn.</p>
           </div>
@@ -567,14 +634,24 @@ function ExercisePage() {
             <div className="control-actions">
               <button className="btn-action-outline" onClick={handleSelectAll}>Chọn tất cả ({words.length})</button>
               <button className="btn-action-outline" onClick={handleDeselectAll}>Bỏ chọn tất cả</button>
+              <span className="selected-count-badge">Đã chọn {selectedWordIds.size} từ</span>
             </div>
-            <button
-              className="btn-action-primary"
-              onClick={handleStartLearning}
-              disabled={selectedWordIds.size === 0}
-            >
-              <PlayCircleOutlined /> Học ngay ({selectedWordIds.size} từ)
-            </button>
+            <div className="learning-buttons-group">
+              <button
+                className="btn-action-primary"
+                onClick={() => handleStartLearning("mc")}
+                disabled={selectedWordIds.size === 0}
+              >
+                Trắc nghiệm
+              </button>
+              <button
+                className="btn-action-primary"
+                onClick={() => handleStartLearning("fitb")}
+                disabled={selectedWordIds.size === 0}
+              >
+                Điền từ
+              </button>
+            </div>
           </div>
         </div>
 
@@ -663,11 +740,6 @@ function ExercisePage() {
             {currentQ.type === "mc" ? "Trắc nghiệm" : "Điền từ"}
           </span>
           <h2 className="question-title">{currentQ.question}</h2>
-          {isAnswered && (
-            <button className="question-audio-btn" onClick={() => speakWord(currentQ.correctAnswer)}>
-              <SoundOutlined />
-            </button>
-          )}
         </div>
 
         {currentQ.type === "mc" ? (
@@ -711,14 +783,25 @@ function ExercisePage() {
                 {isCurrentAnswerCorrect ? (
                   <>
                     <CheckCircleOutlined />
-                    <span>Chính xác! Bạn được <strong>+1 EXP</strong></span>
+                    <span>
+                      Chính xác! Bạn được <strong>+1 EXP</strong>
+                      <span className="feedback-word-val">({currentQ.correctAnswer})</span>
+                      <button className="inline-audio-btn" onClick={() => speakWord(currentQ.correctAnswer)} title="Phát âm">
+                        <SoundOutlined />
+                      </button>
+                    </span>
                   </>
                 ) : (
                   <>
                     <CloseCircleOutlined />
                     <span>
                       Sai rồi! Đáp án đúng là: 
-                      <span className="fitb-correct-reveal">{currentQ.correctAnswer}</span>
+                      <span className="fitb-correct-reveal">
+                        {currentQ.correctAnswer}
+                        <button className="inline-audio-btn" onClick={() => speakWord(currentQ.correctAnswer)} title="Phát âm">
+                          <SoundOutlined />
+                        </button>
+                      </span>
                     </span>
                   </>
                 )}
@@ -729,6 +812,7 @@ function ExercisePage() {
           /* Câu hỏi điền từ */
           <div className="fitb-container">
             <input
+              ref={inputRef}
               type="text"
               className={`fitb-input ${isAnswered ? (isCurrentAnswerCorrect ? "correct" : "incorrect") : ""}`}
               placeholder={isAnswered ? "" : "Gõ tên từ vựng tiếng Anh tương ứng..."}
@@ -759,14 +843,25 @@ function ExercisePage() {
                 {isCurrentAnswerCorrect ? (
                   <>
                     <CheckCircleOutlined />
-                    <span>Chính xác! Bạn được <strong>+2 EXP</strong></span>
+                    <span>
+                      Chính xác! Bạn được <strong>+2 EXP</strong>
+                      <span className="feedback-word-val">({currentQ.correctAnswer})</span>
+                      <button className="inline-audio-btn" onClick={() => speakWord(currentQ.correctAnswer)} title="Phát âm">
+                        <SoundOutlined />
+                      </button>
+                    </span>
                   </>
                 ) : (
                   <>
                     <CloseCircleOutlined />
                     <span>
                       Sai rồi! Đáp án đúng là:
-                      <span className="fitb-correct-reveal">{currentQ.correctAnswer}</span>
+                      <span className="fitb-correct-reveal">
+                        {currentQ.correctAnswer}
+                        <button className="inline-audio-btn" onClick={() => speakWord(currentQ.correctAnswer)} title="Phát âm">
+                          <SoundOutlined />
+                        </button>
+                      </span>
                     </span>
                   </>
                 )}
@@ -818,13 +913,13 @@ function ExercisePage() {
 
         <div className="exercise-actions-panel">
           <button className="btn-summary-action primary" onClick={handleRetrySameWords}>
-            <ReloadOutlined /> Luyện tập lại danh sách từ này
+            <ReloadOutlined /> Luyện tập lại
           </button>
           <button className="btn-summary-action secondary" onClick={handleBackToSelection}>
-            Chọn danh sách từ khác
+            Chọn từ khác
           </button>
           <button className="btn-summary-action secondary" onClick={handleBackToList}>
-            Quay lại danh sách bộ từ
+            Học bộ từ khác
           </button>
         </div>
       </div>
@@ -833,21 +928,12 @@ function ExercisePage() {
 
   return (
     <div className="exercise-container">
-      {/* Navigation Top Header (if not currently playing gameplay) */}
-      {!isPlaying && !isFinished && (
+      {/* Navigation Top Header (if not currently playing gameplay and not selecting words) */}
+      {!isPlaying && !isFinished && !id && (
         <div className="exercise-header">
-          {id && (
-            <button className="btn-back" onClick={handleBackToList}>
-              <ArrowLeftOutlined /> Quay lại
-            </button>
-          )}
           <div className="exercise-header-title">
-            <h1>{id ? "Chọn từ luyện tập" : "Luyện tập Từ vựng"}</h1>
-            <p>
-              {id
-                ? "Lựa chọn các từ vựng cần ôn tập và cải thiện trình độ của bạn"
-                : "Chọn một bộ từ đã lưu từ danh sách bên dưới để bắt đầu làm bài luyện tập"}
-            </p>
+            <h1>Luyện tập Từ vựng</h1>
+            <p>Chọn một bộ từ đã lưu từ danh sách bên dưới để bắt đầu làm bài luyện tập</p>
           </div>
         </div>
       )}

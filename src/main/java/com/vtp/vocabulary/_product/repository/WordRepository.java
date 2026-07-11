@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface WordRepository extends JpaRepository<Word,Long> {
@@ -20,4 +21,9 @@ public interface WordRepository extends JpaRepository<Word,Long> {
     List<Word> findAllByWordSet_Id(Long wordSetId);
 
     List<Word> findAllByWordSetId(Long wordSetId);
+
+    Boolean existsByNameAndDefinitionAndExample(String name, String definition, String example);
+
+    Optional<Word> findByNameAndDefinitionAndExample(String name, String definition, String example);
+
 }

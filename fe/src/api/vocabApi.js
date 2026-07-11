@@ -37,6 +37,11 @@ const vocabApi = {
         return response.data;
     },
 
+    updateWordSet: async (wordSetId, data) => {
+        const response = await axiosClient.put(`/api/word-set/${wordSetId}/update`, data);
+        return response.data;
+    },
+
     // Lấy các bộ từ do người dùng tự tạo (Phân trang)
     // - Request: GET /api/word-set/my?page=0&size=20
     // - Response (Kết quả trả về): Đối tượng Page phân trang

@@ -13,7 +13,8 @@ import {
   StarFilled,
   CloseOutlined,
   EyeOutlined,
-  EyeInvisibleOutlined
+  EyeInvisibleOutlined,
+  DeleteOutlined
 } from "@ant-design/icons";
 import vocabApi from "../../api/vocabApi";
 import "./library.css";
@@ -32,7 +33,7 @@ function LibraryPage() {
 
   // Tìm kiếm & Lưu trữ
   const [searchQuery, setSearchQuery] = useState("");
-  const [savedSetIds, setSavedSetIds] = useState(new Set());
+  const [savedSetMap, setSavedSetMap] = useState({});
   const [savingId, setSavingId] = useState(null);
 
   // Modal xem chi tiết
@@ -54,8 +55,11 @@ function LibraryPage() {
       const savedList = await vocabApi.getSavedWordSets(0, 1000);
       const listData = savedList && (savedList.content || savedList);
       if (Array.isArray(listData)) {
-        const ids = new Set(listData.map(item => item.id));
-        setSavedSetIds(ids);
+        const mapping = {};
+        listData.forEach(item => {
+          mapping[item.id] = item.savedWordSetId || item.id;
+        });
+        setSavedSetMap(mapping);
       }
     } catch (err) {
       console.warn("Không thể tải trạng thái đồng bộ các bộ từ đã lưu:", err);
@@ -79,6 +83,7 @@ function LibraryPage() {
     } finally {
       setLoading(false);
     }
+
   };
 
   const handleSaveSet = async (e, id) => {
@@ -93,11 +98,7 @@ function LibraryPage() {
     setSavingId(id);
     try {
       await vocabApi.saveWordSet(id);
-      setSavedSetIds(prev => {
-        const newSet = new Set(prev);
-        newSet.add(id);
-        return newSet;
-      });
+      await fetchSavedSetsList();
     } catch (err) {
       console.error("Lỗi khi lưu bộ từ:", err);
       alert("Lưu bộ từ thất bại, vui lòng thử lại!");
@@ -116,10 +117,10 @@ function LibraryPage() {
     setSavingId(id);
     try {
       await vocabApi.unsaveWordSet(id);
-      setSavedSetIds(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(id);
-        return newSet;
+      setSavedSetMap(prev => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
       });
     } catch (err) {
       console.error("Lỗi khi bỏ lưu bộ từ:", err);
@@ -178,12 +179,22 @@ function LibraryPage() {
 
   const handleStudy = (e, id) => {
     e.stopPropagation();
-    navigate(`/flash-card-game?id=${id}&type=public`);
+    const isSaved = !!savedSetMap[id];
+    if (isSaved) {
+      navigate(`/flash-card-game?id=${savedSetMap[id]}&type=saved`);
+    } else {
+      navigate(`/flash-card-game?id=${id}&type=public`);
+    }
   };
 
   const handleExercise = (e, id) => {
     e.stopPropagation();
-    navigate(`/exercise?id=${id}`);
+    const isSaved = !!savedSetMap[id];
+    if (isSaved) {
+      navigate(`/exercise?id=${savedSetMap[id]}&type=saved`);
+    } else {
+      navigate(`/exercise?id=${id}&type=public`);
+    }
   };
 
   // Lọc tại Client-side theo ô tìm kiếm (nếu muốn lọc nhanh nội dung trang hiện tại)
@@ -205,11 +216,6 @@ function LibraryPage() {
     <div className="library-page-wrapper">
       {/* Header */}
       <div className="library-header">
-        <div className="header-text-section">
-          <h1>Thư viện công khai</h1>
-          <p>Khám phá các bộ từ vựng được chia sẻ công khai bởi các học viên trong cộng đồng</p>
-        </div>
-
         <div className="search-bar-wrapper">
           <SearchOutlined className="search-icon" />
           <input
@@ -249,7 +255,7 @@ function LibraryPage() {
             {filteredSets.map((set) => {
               const setName = set?.setName || set?.wordSetName || "Không có tên bộ từ";
               const description = set?.description || "Không có mô tả cho bộ từ này.";
-              const isSaved = savedSetIds.has(set.id);
+              const isSaved = !!savedSetMap[set.id];
 
               return (
                 <div key={set.id} className="library-card" onClick={() => handleOpenDetail(set)}>
@@ -269,26 +275,41 @@ function LibraryPage() {
                   </div>
 
                   <div className="card-actions">
-                    <button className="btn-action btn-study" onClick={(e) => handleStudy(e, set.id)}>
-                      Học ngay
-                    </button>
-                    <button className="btn-action btn-exercise" onClick={(e) => handleExercise(e, set.id)}>
-                      Luyện tập
-                    </button>
-                    <button
-                      className={`btn-action btn-bookmark ${isSaved ? "saved" : ""}`}
-                      onClick={(e) => isSaved ? handleUnsaveSet(e, set.id) : handleSaveSet(e, set.id)}
-                      disabled={savingId === set.id}
-                      title={isSaved ? "Bỏ lưu bộ từ" : "Lưu bộ từ vựng"}
-                    >
-                      {savingId === set.id ? (
-                        <LoadingOutlined />
-                      ) : isSaved ? (
-                        <><StarFilled /> Đã lưu</>
-                      ) : (
-                        <><StarOutlined /> Lưu</>
-                      )}
-                    </button>
+                    {isSaved ? (
+                      <>
+                        <button className="btn-action btn-study" onClick={(e) => handleStudy(e, set.id)}>
+                          flashCard
+                        </button>
+                        <button className="btn-action btn-exercise" onClick={(e) => handleExercise(e, set.id)}>
+                          Luyện tập
+                        </button>
+                        <button
+                          className="btn-action btn-unsave"
+                          onClick={(e) => handleUnsaveSet(e, set.id)}
+                          disabled={savingId === set.id}
+                          title="Bỏ lưu bộ từ"
+                        >
+                          {savingId === set.id ? (
+                            <LoadingOutlined />
+                          ) : (
+                            <><DeleteOutlined /> Bỏ lưu</>
+                          )}
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        className="btn-action btn-bookmark"
+                        onClick={(e) => handleSaveSet(e, set.id)}
+                        disabled={savingId === set.id}
+                        title="Lưu bộ từ vựng"
+                      >
+                        {savingId === set.id ? (
+                          <LoadingOutlined />
+                        ) : (
+                          <><StarOutlined /> Lưu</>
+                        )}
+                      </button>
+                    )}
                   </div>
                 </div>
               );
