@@ -44,3 +44,4 @@ Chỉ hỗ trợ học từ vựng <br>
 <Có thể sẽ phát triển thêm chức năng kiểm tra, với mỗi câu đúng +5 exp cho từ tương ứng, hoặc không!>
 
 <bye>
+<bye>
