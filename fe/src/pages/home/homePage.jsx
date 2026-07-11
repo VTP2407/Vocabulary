@@ -65,7 +65,8 @@ function HomePage() {
             </Link>
           </div>
 
-          {/* Card 3: Test */}
+          {/* Card 3: Test (Tạm thời ẩn theo yêu cầu) */}
+          {/* 
           <div className="mode-card">
             <div className="card-icon-wrapper">
               <img src={testIcon} alt="Test Icon" className="card-icon" />
@@ -78,6 +79,7 @@ function HomePage() {
               KIỂM TRA
             </Link>
           </div>
+          */}
 
           {/* Card 4: Create Vocabulary */}
           <div className="mode-card">

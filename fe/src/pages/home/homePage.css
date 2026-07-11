@@ -162,7 +162,7 @@
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr); /* Tạm thời đổi từ 4 sang 3 cột do ẩn chức năng kiểm tra */
   gap: 24px;
   width: 100%;
 }

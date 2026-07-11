@@ -160,13 +160,28 @@ function MyWordSetsPage() {
     }
   };
 
+  const speakWord = (text) => {
+    if (!text) return;
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "en-US";
+      utterance.rate = 0.85; // Slightly slower for clear learning
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
   const handleToggleWord = (wordId) => {
+    const word = wordSetDetail?.words?.find(w => w.id === wordId);
     setExpandedWordIds(prev => {
       const next = new Set(prev);
       if (next.has(wordId)) {
         next.delete(wordId);
       } else {
         next.add(wordId);
+        if (word && word.name) {
+          speakWord(word.name);
+        }
       }
       return next;
     });
