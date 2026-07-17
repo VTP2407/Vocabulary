@@ -6,6 +6,7 @@ import {
   GlobalOutlined,
   LockOutlined,
   PlusOutlined,
+  ArrowLeftOutlined,
   ArrowRightOutlined,
   DeleteOutlined,
   EyeOutlined,
@@ -30,6 +31,12 @@ function MyWordSetsPage() {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Phân trang
+  const [currentPage, setCurrentPage] = useState(0); // 0-indexed
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
+  const PAGE_SIZE = 12; // Hiển thị tối đa 12 bộ từ mỗi trang
+
   // Trạng thái modal xem chi tiết
   const [selectedSet, setSelectedSet] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -40,16 +47,19 @@ function MyWordSetsPage() {
     const token = localStorage.getItem("token");
     if (token) {
       setIsLoggedIn(true);
-      fetchData(activeTab);
+      const delayDebounceFn = setTimeout(() => {
+        fetchData(activeTab, currentPage, searchQuery);
+      }, 300);
+      return () => clearTimeout(delayDebounceFn);
     } else {
       setIsLoggedIn(false);
       setLoading(false);
     }
-  }, [activeTab]);
+  }, [activeTab, currentPage, searchQuery]);
 
   const fetchSavedSetsOnly = async () => {
     try {
-      const data = await vocabApi.getSavedWordSets();
+      const data = await vocabApi.getSavedWordSets(0, 1000);
       const listData = data && (data.content || data);
       setSavedSets(Array.isArray(listData) ? listData : []);
     } catch (err) {
@@ -73,20 +83,42 @@ function MyWordSetsPage() {
     }
   };
 
-  const fetchData = async (tab = activeTab) => {
+  const fetchData = async (tab = activeTab, page = currentPage, query = searchQuery) => {
     setLoading(true);
     setError(null);
     try {
       if (tab === "created") {
-        const data = await vocabApi.getMyWordSet();
+        let data;
+        if (query.trim()) {
+          data = await vocabApi.searchMyWordSets(query, page, PAGE_SIZE);
+        } else {
+          data = await vocabApi.getMyWordSet(page, PAGE_SIZE);
+        }
         const listData = data && (data.content || data);
+        if (page > 0 && Array.isArray(listData) && listData.length === 0) {
+          setCurrentPage(page - 1);
+          return;
+        }
         setPersonalSets(Array.isArray(listData) ? listData : []);
+        setTotalPages(data?.totalPages ?? data?.page?.totalPages ?? 0);
+        setTotalElements(data?.totalElements ?? data?.page?.totalElements ?? 0);
         // Also fetch saved sets to check saved status of created sets
         await fetchSavedSetsOnly();
       } else {
-        const data = await vocabApi.getSavedWordSets();
+        let data;
+        if (query.trim()) {
+          data = await vocabApi.searchSavedWordSets(query, page, PAGE_SIZE);
+        } else {
+          data = await vocabApi.getSavedWordSets(page, PAGE_SIZE);
+        }
         const listData = data && (data.content || data);
+        if (page > 0 && Array.isArray(listData) && listData.length === 0) {
+          setCurrentPage(page - 1);
+          return;
+        }
         setSavedSets(Array.isArray(listData) ? listData : []);
+        setTotalPages(data?.totalPages ?? data?.page?.totalPages ?? 0);
+        setTotalElements(data?.totalElements ?? data?.page?.totalElements ?? 0);
       }
     } catch (err) {
       console.error(`Lỗi khi tải danh sách bộ từ ${tab === "created" ? "đã tạo" : "đã lưu"}:`, err);
@@ -102,7 +134,11 @@ function MyWordSetsPage() {
 
     try {
       await vocabApi.unsaveWordSet(id);
-      setSavedSets(prev => prev.filter(set => set.id !== id));
+      if (activeTab === "saved") {
+        await fetchData("saved", currentPage);
+      } else {
+        setSavedSets(prev => prev.filter(set => set.id !== id));
+      }
       if (selectedSet && selectedSet.id === id) {
         setSelectedSet(null);
         setWordSetDetail(null);
@@ -120,10 +156,34 @@ function MyWordSetsPage() {
     try {
       await vocabApi.deleteWordSet(id);
       alert("Xóa bộ từ vựng thành công!");
-      await fetchData();
+      await fetchData(activeTab, currentPage);
     } catch (err) {
       console.error("Lỗi khi xóa bộ từ vựng:", err);
       alert("Xóa bộ từ vựng thất bại!");
+    }
+  };
+
+  const getPageNumbers = () => {
+    const maxButtons = 5;
+    let startPage = Math.max(0, currentPage - 2);
+    let endPage = startPage + maxButtons - 1;
+
+    if (endPage >= totalPages) {
+      endPage = totalPages - 1;
+      startPage = Math.max(0, endPage - maxButtons + 1);
+    }
+
+    const pages = [];
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    return pages;
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 0 && newPage < totalPages) {
+      setCurrentPage(newPage);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -300,14 +360,9 @@ function MyWordSetsPage() {
     navigate(`/exercise?id=${queryId}&type=${type}`);
   };
 
-  // Lọc bộ từ theo tìm kiếm
+  // Dữ liệu bộ từ đã được lọc và phân trang từ Server-side
   const currentSets = activeTab === "created" ? personalSets : savedSets;
-  const filteredSets = Array.isArray(currentSets) ? currentSets.filter(set => {
-    const name = set?.setName || set?.wordSetName || "";
-    const desc = set?.description || "";
-    return name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      desc.toLowerCase().includes(searchQuery.toLowerCase());
-  }) : [];
+  const filteredSets = Array.isArray(currentSets) ? currentSets : [];
 
   if (!isLoggedIn) {
     return (
@@ -333,6 +388,7 @@ function MyWordSetsPage() {
             className={`tab-btn ${activeTab === "created" ? "active" : ""}`}
             onClick={() => {
               setActiveTab("created");
+              setCurrentPage(0);
               setSearchQuery("");
             }}
           >
@@ -343,6 +399,7 @@ function MyWordSetsPage() {
             className={`tab-btn ${activeTab === "saved" ? "active" : ""}`}
             onClick={() => {
               setActiveTab("saved");
+              setCurrentPage(0);
               setSearchQuery("");
             }}
           >
@@ -358,7 +415,10 @@ function MyWordSetsPage() {
               type="text"
               placeholder="Tìm kiếm bộ từ..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(0);
+              }}
             />
           </div>
           {activeTab === "created" && (
@@ -398,92 +458,126 @@ function MyWordSetsPage() {
           )}
         </div>
       ) : (
-        /* Grid Card danh sách bộ từ */
-        <div className="my-vocab-grid">
-          {filteredSets.map((set) => {
-            const visibility = set?.visibility || "PUBLIC";
-            const setName = set?.setName || set?.wordSetName || "Không có tên bộ từ";
-            const description = set?.description || "Không có mô tả cho bộ từ này.";
-            return (
-              <div key={set?.id} className="vocab-set-card" onClick={() => handleOpenDetail(set)}>
-                {activeTab === "created" && (
-                  <button
-                    className="delete-set-btn"
-                    onClick={(e) => handleDeleteSet(e, set.id)}
-                    title="Xóa bộ từ vựng"
-                  >
-                    <CloseOutlined />
-                  </button>
-                )}
-                <div className="card-top">
-                  <div className="card-badge-row">
-                    <span className={`visibility-badge ${visibility.toLowerCase()}`}>
-                      {visibility === "PUBLIC" ? (
-                        <><GlobalOutlined /> Công khai</>
-                      ) : (
-                        <><LockOutlined /> Riêng tư</>
-                      )}
-                    </span>
-                    {set?.wordCount !== undefined && set?.wordCount !== null && (
-                      <span className="word-count-badge">
-                        {set.wordCount} từ
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="card-title">{setName}</h3>
-                  <p className="card-desc">{description}</p>
-                </div>
-
-                <div className="card-actions">
-                  {activeTab === "created" ? (
-                    <>
-                      <button
-                        className="btn-action btn-edit"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/vocabulary?id=${set.id}`, {
-                            state: {
-                              setName: set.setName || set.wordSetName,
-                              description: set.description,
-                              visibility: set.visibility
-                            }
-                          });
-                        }}
-                      >
-                        Sửa
-                      </button>
-                      {checkIsSaved(set.id) ? (
-                        <button
-                          className="btn-action btn-unsave"
-                          onClick={(e) => handleUnsave(e, set.id)}
-                          title="Bỏ lưu bộ từ"
-                        >
-                          <DeleteOutlined /> Bỏ lưu
-                        </button>
-                      ) : (
-                        <button
-                          className="btn-action btn-save"
-                          onClick={(e) => handleSave(e, set.id)}
-                          title="Lưu bộ từ"
-                        >
-                          Lưu
-                        </button>
-                      )}
-                    </>
-                  ) : (
+        <>
+          <div className="my-vocab-grid">
+            {filteredSets.map((set) => {
+              const visibility = set?.visibility || "PUBLIC";
+              const setName = set?.setName || set?.wordSetName || "Không có tên bộ từ";
+              const description = set?.description || "Không có mô tả cho bộ từ này.";
+              return (
+                <div key={set?.id} className="vocab-set-card" onClick={() => handleOpenDetail(set)}>
+                  {activeTab === "created" && (
                     <button
-                      className="btn-action btn-unsave"
-                      onClick={(e) => handleUnsave(e, set.id)}
-                      title="Bỏ lưu bộ từ"
+                      className="delete-set-btn"
+                      onClick={(e) => handleDeleteSet(e, set.id)}
+                      title="Xóa bộ từ vựng"
                     >
-                      <DeleteOutlined /> Bỏ lưu
+                      <CloseOutlined />
                     </button>
                   )}
+                  <div className="card-top">
+                    <div className="card-badge-row">
+                      <span className={`visibility-badge ${visibility.toLowerCase()}`}>
+                        {visibility === "PUBLIC" ? (
+                          <><GlobalOutlined /> Công khai</>
+                        ) : (
+                          <><LockOutlined /> Riêng tư</>
+                        )}
+                      </span>
+                      {set?.wordCount !== undefined && set?.wordCount !== null && (
+                        <span className="word-count-badge">
+                          {set.wordCount} từ
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="card-title">{setName}</h3>
+                    <p className="card-desc">{description}</p>
+                  </div>
+
+                  <div className="card-actions">
+                    {activeTab === "created" ? (
+                      <>
+                        <button
+                          className="btn-action btn-edit"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/vocabulary?id=${set.id}`, {
+                              state: {
+                                setName: set.setName || set.wordSetName,
+                                description: set.description,
+                                visibility: set.visibility
+                              }
+                            });
+                          }}
+                        >
+                          Sửa
+                        </button>
+                        {checkIsSaved(set.id) ? (
+                          <button
+                            className="btn-action btn-unsave"
+                            onClick={(e) => handleUnsave(e, set.id)}
+                            title="Bỏ lưu bộ từ"
+                          >
+                            <DeleteOutlined /> Bỏ lưu
+                          </button>
+                        ) : (
+                          <button
+                            className="btn-action btn-save"
+                            onClick={(e) => handleSave(e, set.id)}
+                            title="Lưu bộ từ"
+                          >
+                            Lưu
+                          </button>
+                        )}
+                      </>
+                    ) : (
+                      <button
+                        className="btn-action btn-unsave"
+                        onClick={(e) => handleUnsave(e, set.id)}
+                        title="Bỏ lưu bộ từ"
+                      >
+                        <DeleteOutlined /> Bỏ lưu
+                      </button>
+                    )}
+                  </div>
                 </div>
+              );
+            })}
+          </div>
+
+          {/* Điều khiển phân trang (Pagination) */}
+          {totalPages > 0 && (
+            <div className="pagination-container">
+              <button
+                className="pagination-btn"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 0}
+              >
+                <ArrowLeftOutlined /> Trước
+              </button>
+
+              <div className="pagination-numbers">
+                {getPageNumbers().map((index) => (
+                  <button
+                    key={index}
+                    className={`pagination-num-btn ${currentPage === index ? "active" : ""}`}
+                    onClick={() => handlePageChange(index)}
+                  >
+                    {index + 1}
+                  </button>
+                ))}
               </div>
-            );
-          })}
-        </div>
+
+              <button
+                className="pagination-btn"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages - 1}
+              >
+                Sau <ArrowRightOutlined />
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       {/* MODAL XEM CHI TIẾT TỪ VỰNG TRONG BỘ TỪ */}

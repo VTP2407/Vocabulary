@@ -59,6 +59,33 @@ public class VocabularyController {
         return wordSetService.getSavedWordSet(page, size);
     }
 
+    @GetMapping("/my/search")
+    Page<MyWordSetResponse> searchMyWordSets(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size
+    ) {
+        return wordSetService.searchMyWordSets(query, page, size);
+    }
+
+    @GetMapping("/public/search")
+    Page<WordSetResponse> searchPublicWordSets(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size
+    ) {
+        return wordSetService.searchPublicWordSets(query, page, size);
+    }
+
+    @GetMapping("/saved/search")
+    Page<SavedWordSetResponse> searchSavedWordSets(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size
+    ) {
+        return wordSetService.searchSavedWordSets(query, page, size);
+    }
+
     @GetMapping("/{wordSetId}")
     PublicWordSetDetail getPublicWordSetDetail(@PathVariable Long wordSetId){
         return wordSetService.getPublicWordSetDetail(wordSetId);

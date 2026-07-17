@@ -29,7 +29,7 @@ function LibraryPage() {
   const [currentPage, setCurrentPage] = useState(0); // 0-indexed
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
-  const PAGE_SIZE = 20; // Hiển thị tối đa 20 bộ từ mỗi trang
+  const PAGE_SIZE = 12; // Hiển thị tối đa 12 bộ từ mỗi trang
 
   // Tìm kiếm & Lưu trữ
   const [searchQuery, setSearchQuery] = useState("");
@@ -43,9 +43,16 @@ function LibraryPage() {
   const [expandedWordIds, setExpandedWordIds] = useState(new Set());
 
   useEffect(() => {
-    fetchPublicSets(currentPage);
+    const delayDebounceFn = setTimeout(() => {
+      fetchPublicSets(currentPage, searchQuery);
+    }, 300);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [currentPage, searchQuery]);
+
+  useEffect(() => {
     fetchSavedSetsList();
-  }, [currentPage]);
+  }, []);
 
   // Tải danh sách bộ từ đã lưu của user để đồng bộ trạng thái nút "Lưu"
   const fetchSavedSetsList = async () => {
@@ -66,16 +73,21 @@ function LibraryPage() {
     }
   };
 
-  const fetchPublicSets = async (page) => {
+  const fetchPublicSets = async (page, query = searchQuery) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await vocabApi.getPublicWordSets(page, PAGE_SIZE);
+      let data;
+      if (query.trim()) {
+        data = await vocabApi.searchPublicWordSets(query, page, PAGE_SIZE);
+      } else {
+        data = await vocabApi.getPublicWordSets(page, PAGE_SIZE);
+      }
       // Backend trả về đối tượng Page
       if (data) {
         setPublicSets(data.content || []);
-        setTotalPages(data.totalPages || 0);
-        setTotalElements(data.totalElements || 0);
+        setTotalPages(data.totalPages ?? data.page?.totalPages ?? 0);
+        setTotalElements(data.totalElements ?? data.page?.totalElements ?? 0);
       }
     } catch (err) {
       console.error("Lỗi khi tải danh sách thư viện công khai:", err);
@@ -212,13 +224,25 @@ function LibraryPage() {
     }
   };
 
-  // Lọc tại Client-side theo ô tìm kiếm (nếu muốn lọc nhanh nội dung trang hiện tại)
-  const filteredSets = publicSets.filter(set => {
-    const name = set?.setName || set?.wordSetName || "";
-    const desc = set?.description || "";
-    return name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      desc.toLowerCase().includes(searchQuery.toLowerCase());
-  });
+  // Dữ liệu bộ từ đã được lọc và phân trang từ Server-side
+  const filteredSets = publicSets;
+
+  const getPageNumbers = () => {
+    const maxButtons = 5;
+    let startPage = Math.max(0, currentPage - 2);
+    let endPage = startPage + maxButtons - 1;
+
+    if (endPage >= totalPages) {
+      endPage = totalPages - 1;
+      startPage = Math.max(0, endPage - maxButtons + 1);
+    }
+
+    const pages = [];
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    return pages;
+  };
 
   const handlePageChange = (newPage) => {
     if (newPage >= 0 && newPage < totalPages) {
@@ -235,9 +259,12 @@ function LibraryPage() {
           <SearchOutlined className="search-icon" />
           <input
             type="text"
-            placeholder="Tìm kiếm nhanh trên trang này..."
+            placeholder="Tìm kiếm bộ từ..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setCurrentPage(0);
+            }}
           />
         </div>
       </div>
@@ -332,7 +359,7 @@ function LibraryPage() {
           </div>
 
           {/* Điều khiển phân trang (Pagination) */}
-          {totalPages > 1 && (
+          {totalPages > 0 && (
             <div className="pagination-container">
               <button
                 className="pagination-btn"
@@ -343,7 +370,7 @@ function LibraryPage() {
               </button>
 
               <div className="pagination-numbers">
-                {Array.from({ length: totalPages }).map((_, index) => (
+                {getPageNumbers().map((index) => (
                   <button
                     key={index}
                     className={`pagination-num-btn ${currentPage === index ? "active" : ""}`}

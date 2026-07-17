@@ -49,6 +49,7 @@ public interface SavedWordSetRepository extends JpaRepository<SavedWordSet,Long>
                 sws.createdBy,
                 sws.setName,
                 sws.description
+            ORDER BY sws.id ASC
             """,
             countQuery = """
             SELECT COUNT(sws)
@@ -60,4 +61,65 @@ public interface SavedWordSetRepository extends JpaRepository<SavedWordSet,Long>
             @Param("userId") Long userId,
             Pageable pageable
     );
+
+    @Query(
+            value = """
+            SELECT new com.vtp.vocabulary.dto.response.SavedWordSetResponse(
+                sws.sourceWordSetId,
+                sws.id,
+                sws.createdBy,
+                sws.setName,
+                sws.description,
+                COUNT(sw.id)
+            )
+            FROM SavedWordSet sws
+            LEFT JOIN sws.savedWords sw
+            WHERE sws.userId = :userId
+              AND (LOWER(sws.setName) LIKE LOWER(CONCAT('%', :query, '%')) 
+                   OR LOWER(sws.description) LIKE LOWER(CONCAT('%', :query, '%')))
+            GROUP BY
+                sws.sourceWordSetId,
+                sws.id,
+                sws.createdBy,
+                sws.setName,
+                sws.description
+            ORDER BY sws.id ASC
+            """,
+            countQuery = """
+            SELECT COUNT(sws)
+            FROM SavedWordSet sws
+            WHERE sws.userId = :userId
+              AND (LOWER(sws.setName) LIKE LOWER(CONCAT('%', :query, '%')) 
+                   OR LOWER(sws.description) LIKE LOWER(CONCAT('%', :query, '%')))
+            """
+    )
+    Page<SavedWordSetResponse> searchSavedWordSets(
+            @Param("userId") Long userId,
+            @Param("query") String query,
+            Pageable pageable
+    );
+
+    @Query(
+            value = """
+            SELECT new com.vtp.vocabulary.dto.response.SavedWordSetResponse(
+                sws.sourceWordSetId,
+                sws.id,
+                sws.createdBy,
+                sws.setName,
+                sws.description,
+                COUNT(sw.id)
+            )
+            FROM SavedWordSet sws
+            LEFT JOIN sws.savedWords sw
+            WHERE sws.userId = :userId
+            GROUP BY
+                sws.sourceWordSetId,
+                sws.id,
+                sws.createdBy,
+                sws.setName,
+                sws.description
+            ORDER BY sws.id ASC
+            """
+    )
+    List<SavedWordSetResponse> findAllSavedWordSets(@Param("userId") Long userId);
 }

@@ -170,6 +170,27 @@ const vocabApi = {
         return response.data;
     },
 
+    searchMyWordSets: async (query, page = 0, size = 20) => {
+        const response = await axiosClient.get("/api/word-set/my/search", {
+            params: { query, page, size }
+        });
+        return response.data;
+    },
+
+    searchPublicWordSets: async (query, page = 0, size = 20) => {
+        const response = await axiosClient.get("/api/word-set/public/search", {
+            params: { query, page, size }
+        });
+        return response.data;
+    },
+
+    searchSavedWordSets: async (query, page = 0, size = 20) => {
+        const response = await axiosClient.get("/api/word-set/saved/search", {
+            params: { query, page, size }
+        });
+        return response.data;
+    },
+
     // Gửi danh sách kết quả bài kiểm tra/luyện tập để cập nhật EXP cho các từ (không cần mã bộ từ)
     // - Request Body (Dữ liệu gửi đi):
     //   {

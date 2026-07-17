@@ -17,12 +17,15 @@ import com.vtp.vocabulary.exception.BusinessException;
 import com.vtp.vocabulary.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.Normalizer;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -58,6 +61,65 @@ public class WordSetService {
                 CurrentUserUtils.getUserId(),
                 pageable
         );
+    }
+
+    private String removeAccents(String src) {
+        if (src == null) {
+            return "";
+        }
+        String temp = Normalizer.normalize(src, Normalizer.Form.NFD);
+        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        return pattern.matcher(temp).replaceAll("")
+                .toLowerCase()
+                .replace('đ', 'd')
+                .replace('Đ', 'd');
+    }
+
+    private <T> Page<T> paginateList(List<T> list, int page, int size) {
+        int start = page * size;
+        if (start >= list.size()) {
+            return new PageImpl<>(List.of(), PageRequest.of(page, size), list.size());
+        }
+        int end = Math.min(start + size, list.size());
+        return new PageImpl<>(list.subList(start, end), PageRequest.of(page, size), list.size());
+    }
+
+    public Page<MyWordSetResponse> searchMyWordSets(String query, int page, int size) {
+        List<MyWordSetResponse> allSets = wordSetRepository.findAllMyWordSets(CurrentUserUtils.getUserId());
+        String normalizedQuery = removeAccents(query);
+
+        List<MyWordSetResponse> filtered = allSets.stream()
+                .filter(ws -> removeAccents(ws.getWordSetName()).contains(normalizedQuery) ||
+                        (ws.getDescription() != null && removeAccents(ws.getDescription()).contains(normalizedQuery)))
+                .toList();
+
+        return paginateList(filtered, page, size);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<WordSetResponse> searchPublicWordSets(String query, int page, int size) {
+        List<WordSetResponse> allSets = wordSetRepository.findAllPublicWordSets(Visibility.PUBLIC);
+        String normalizedQuery = removeAccents(query);
+
+        List<WordSetResponse> filtered = allSets.stream()
+                .filter(ws -> removeAccents(ws.getWordSetName()).contains(normalizedQuery) ||
+                        (ws.getDescription() != null && removeAccents(ws.getDescription()).contains(normalizedQuery)))
+                .toList();
+
+        return paginateList(filtered, page, size);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<SavedWordSetResponse> searchSavedWordSets(String query, int page, int size) {
+        List<SavedWordSetResponse> allSets = savedWordSetRepository.findAllSavedWordSets(CurrentUserUtils.getUserId());
+        String normalizedQuery = removeAccents(query);
+
+        List<SavedWordSetResponse> filtered = allSets.stream()
+                .filter(ws -> removeAccents(ws.getWordSetName()).contains(normalizedQuery) ||
+                        (ws.getDescription() != null && removeAccents(ws.getDescription()).contains(normalizedQuery)))
+                .toList();
+
+        return paginateList(filtered, page, size);
     }
 
     public PublicWordSetDetail getPublicWordSetDetail(Long wordSetId){

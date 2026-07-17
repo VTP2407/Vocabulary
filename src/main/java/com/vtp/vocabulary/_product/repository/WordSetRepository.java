@@ -30,6 +30,7 @@ public interface WordSetRepository extends JpaRepository<WordSet, Long> {
                     LEFT JOIN Word w ON w.wordSet = ws
                     WHERE ws.userId = :userId
                     GROUP BY ws.id, ws.setName, ws.description, ws.visibility
+                    ORDER BY ws.id ASC
                     """,
             countQuery = """
                     SELECT COUNT(ws)
@@ -39,6 +40,37 @@ public interface WordSetRepository extends JpaRepository<WordSet, Long> {
     )
     Page<MyWordSetResponse> findMyWordSets(
             @Param("userId") Long userId,
+            Pageable pageable
+    );
+
+    @Query(
+            value = """
+                    SELECT new com.vtp.vocabulary.dto.response.MyWordSetResponse(
+                        ws.id,
+                        ws.setName,
+                        ws.description,
+                        ws.visibility,
+                        COUNT(w.id)
+                    )
+                    FROM WordSet ws
+                    LEFT JOIN Word w ON w.wordSet = ws
+                    WHERE ws.userId = :userId
+                      AND (LOWER(ws.setName) LIKE LOWER(CONCAT('%', :query, '%')) 
+                           OR LOWER(ws.description) LIKE LOWER(CONCAT('%', :query, '%')))
+                    GROUP BY ws.id, ws.setName, ws.description, ws.visibility
+                    ORDER BY ws.id ASC
+                    """,
+            countQuery = """
+                    SELECT COUNT(ws)
+                    FROM WordSet ws
+                    WHERE ws.userId = :userId
+                      AND (LOWER(ws.setName) LIKE LOWER(CONCAT('%', :query, '%')) 
+                           OR LOWER(ws.description) LIKE LOWER(CONCAT('%', :query, '%')))
+                    """
+    )
+    Page<MyWordSetResponse> searchMyWordSets(
+            @Param("userId") Long userId,
+            @Param("query") String query,
             Pageable pageable
     );
 
@@ -55,6 +87,7 @@ public interface WordSetRepository extends JpaRepository<WordSet, Long> {
                     LEFT JOIN Word w ON w.wordSet = ws
                     WHERE ws.visibility = :visibility
                     GROUP BY ws.id, ws.setName, ws.description, ws.visibility
+                    ORDER BY ws.id ASC
                     """,
             countQuery = """
                     SELECT COUNT(ws)
@@ -66,4 +99,71 @@ public interface WordSetRepository extends JpaRepository<WordSet, Long> {
             @Param("visibility") Visibility visibility,
             Pageable pageable
     );
+
+    @Query(
+            value = """
+                    SELECT new com.vtp.vocabulary.dto.response.WordSetResponse(
+                        ws.id,
+                        ws.setName,
+                        ws.description,
+                        ws.visibility,
+                        COUNT(w.id)
+                    )
+                    FROM WordSet ws
+                    LEFT JOIN Word w ON w.wordSet = ws
+                    WHERE ws.visibility = :visibility
+                      AND (LOWER(ws.setName) LIKE LOWER(CONCAT('%', :query, '%')) 
+                           OR LOWER(ws.description) LIKE LOWER(CONCAT('%', :query, '%')))
+                    GROUP BY ws.id, ws.setName, ws.description, ws.visibility
+                    ORDER BY ws.id ASC
+                    """,
+            countQuery = """
+                    SELECT COUNT(ws)
+                    FROM WordSet ws
+                    WHERE ws.visibility = :visibility
+                      AND (LOWER(ws.setName) LIKE LOWER(CONCAT('%', :query, '%')) 
+                           OR LOWER(ws.description) LIKE LOWER(CONCAT('%', :query, '%')))
+                    """
+    )
+    Page<WordSetResponse> searchPublicWordSets(
+            @Param("visibility") Visibility visibility,
+            @Param("query") String query,
+            Pageable pageable
+    );
+
+    @Query(
+            value = """
+                    SELECT new com.vtp.vocabulary.dto.response.MyWordSetResponse(
+                        ws.id,
+                        ws.setName,
+                        ws.description,
+                        ws.visibility,
+                        COUNT(w.id)
+                    )
+                    FROM WordSet ws
+                    LEFT JOIN Word w ON w.wordSet = ws
+                    WHERE ws.userId = :userId
+                    GROUP BY ws.id, ws.setName, ws.description, ws.visibility
+                    ORDER BY ws.id ASC
+                    """
+    )
+    List<MyWordSetResponse> findAllMyWordSets(@Param("userId") Long userId);
+
+    @Query(
+            value = """
+                    SELECT new com.vtp.vocabulary.dto.response.WordSetResponse(
+                        ws.id,
+                        ws.setName,
+                        ws.description,
+                        ws.visibility,
+                        COUNT(w.id)
+                    )
+                    FROM WordSet ws
+                    LEFT JOIN Word w ON w.wordSet = ws
+                    WHERE ws.visibility = :visibility
+                    GROUP BY ws.id, ws.setName, ws.description, ws.visibility
+                    ORDER BY ws.id ASC
+                    """
+    )
+    List<WordSetResponse> findAllPublicWordSets(@Param("visibility") Visibility visibility);
 }
