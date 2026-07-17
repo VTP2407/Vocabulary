@@ -28,7 +28,7 @@ Chỉ hỗ trợ học từ vựng <br>
 - Tự làm
 - Login bằng Google: Khi đăng nhập bằng Google
   -> Google xác minh và gửi về Token ID
-  -> giải mã Token ID này để lấy thông tin người dùng
+  -> giải mã ID Token này để lấy thông tin người dùng
   -> sử dụng thông tin này để tạo JWT xác minh định danh cho mỗi người dùng
 - Login thường: đăng ký tài khoản và mật khẩu trên web
   -> khi đăng nhập tạo JWT xác minh người dùng tương tự như trên
