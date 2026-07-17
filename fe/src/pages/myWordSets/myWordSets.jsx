@@ -35,7 +35,18 @@ function MyWordSetsPage() {
   const [currentPage, setCurrentPage] = useState(0); // 0-indexed
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
-  const PAGE_SIZE = 12; // Hiển thị tối đa 12 bộ từ mỗi trang
+
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const PAGE_SIZE = isMobile ? 6 : 12;
 
   // Trạng thái modal xem chi tiết
   const [selectedSet, setSelectedSet] = useState(null);
@@ -55,7 +66,7 @@ function MyWordSetsPage() {
       setIsLoggedIn(false);
       setLoading(false);
     }
-  }, [activeTab, currentPage, searchQuery]);
+  }, [activeTab, currentPage, searchQuery, PAGE_SIZE]);
 
   const fetchSavedSetsOnly = async () => {
     try {
@@ -553,7 +564,7 @@ function MyWordSetsPage() {
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 0}
               >
-                <ArrowLeftOutlined /> Trước
+                <ArrowLeftOutlined /> <span className="pagination-text">Trước</span>
               </button>
 
               <div className="pagination-numbers">
@@ -573,7 +584,7 @@ function MyWordSetsPage() {
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages - 1}
               >
-                Sau <ArrowRightOutlined />
+                <span className="pagination-text">Sau</span> <ArrowRightOutlined />
               </button>
             </div>
           )}

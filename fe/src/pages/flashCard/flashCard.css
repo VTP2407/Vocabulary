@@ -249,3 +249,18 @@
 .page-indicator strong {
   color: #0b4c5c;
 }
+
+@media (max-width: 768px) {
+  .pagination-text {
+    display: none;
+  }
+  .pagination-wrapper {
+    flex-direction: row !important;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-page {
+    padding: 8px 12px;
+  }
+}

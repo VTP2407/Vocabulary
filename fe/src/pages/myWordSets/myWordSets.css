@@ -1390,3 +1390,19 @@
   color: #ffffff;
   box-shadow: 0 4px 10px rgba(12, 166, 198, 0.25);
 }
+
+@media (max-width: 768px) {
+  .pagination-text {
+    display: none;
+  }
+  .pagination-container {
+    flex-direction: row !important;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 20px 0 10px;
+  }
+  .pagination-btn {
+    padding: 8px 12px;
+  }
+}

@@ -29,7 +29,18 @@ function LibraryPage() {
   const [currentPage, setCurrentPage] = useState(0); // 0-indexed
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
-  const PAGE_SIZE = 12; // Hiển thị tối đa 12 bộ từ mỗi trang
+
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const PAGE_SIZE = isMobile ? 6 : 12;
 
   // Tìm kiếm & Lưu trữ
   const [searchQuery, setSearchQuery] = useState("");
@@ -48,7 +59,7 @@ function LibraryPage() {
     }, 300);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [currentPage, searchQuery]);
+  }, [currentPage, searchQuery, PAGE_SIZE]);
 
   useEffect(() => {
     fetchSavedSetsList();
@@ -366,7 +377,7 @@ function LibraryPage() {
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 0}
               >
-                <ArrowLeftOutlined /> Trước
+                <ArrowLeftOutlined /> <span className="pagination-text">Trước</span>
               </button>
 
               <div className="pagination-numbers">
@@ -386,7 +397,7 @@ function LibraryPage() {
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages - 1}
               >
-                Sau <ArrowRightOutlined />
+                <span className="pagination-text">Sau</span> <ArrowRightOutlined />
               </button>
             </div>
           )}

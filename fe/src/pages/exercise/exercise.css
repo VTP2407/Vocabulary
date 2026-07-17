@@ -865,3 +865,18 @@
 .page-indicator-text strong {
   color: #0b4c5c;
 }
+
+@media (max-width: 768px) {
+  .pagination-text {
+    display: none;
+  }
+  .exercise-pagination-wrapper {
+    flex-direction: row !important;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-page-ctrl {
+    padding: 8px 12px;
+  }
+}

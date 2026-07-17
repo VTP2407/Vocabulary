@@ -137,13 +137,24 @@ function ExercisePage() {
           };
         });
 
-        // Sắp xếp: Ưu tiên EXP thấp lên trên (tăng dần), sau đó theo bảng chữ cái A-Z
+        // Sắp xếp:
+        // 1. Cấp độ 5 (EXP >= 435, màu cầu vồng) cho xuống cuối cùng.
+        // 2. Những từ còn lại xếp theo thứ tự giảm dần của EXP (EXP cao trước).
+        // 3. Nếu cùng EXP thì xếp theo bảng chữ cái A-Z.
         normalized.sort((a, b) => {
           const expA = Number(a.exp) || 0;
           const expB = Number(b.exp) || 0;
-          if (expA !== expB) {
-            return expA - expB; // EXP thấp lên trên, EXP cao xuống dưới
+          const isLvl5A = expA >= 435;
+          const isLvl5B = expB >= 435;
+
+          if (isLvl5A !== isLvl5B) {
+            return isLvl5A ? 1 : -1;
           }
+
+          if (expA !== expB) {
+            return expB - expA; // Xếp giảm dần
+          }
+
           return a.name.localeCompare(b.name, "en", { sensitivity: "base" });
         });
 
@@ -579,7 +590,7 @@ function ExercisePage() {
               onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
               disabled={currentPage === 0}
             >
-              <ArrowLeftOutlined /> Trước
+              <ArrowLeftOutlined /> <span className="pagination-text">Trước</span>
             </button>
             <span className="page-indicator-text">
               Trang <strong>{currentPage + 1}</strong> / {totalPages}
@@ -589,7 +600,7 @@ function ExercisePage() {
               onClick={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))}
               disabled={currentPage === totalPages - 1}
             >
-              Tiếp theo <ArrowRightOutlined />
+              <span className="pagination-text">Tiếp theo</span> <ArrowRightOutlined />
             </button>
           </div>
         )}

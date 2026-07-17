@@ -140,7 +140,7 @@ function FlashCardPage() {
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 0}
               >
-                <ArrowLeftOutlined /> Trước
+                <ArrowLeftOutlined /> <span className="pagination-text">Trước</span>
               </button>
               <span className="page-indicator">
                 Trang <strong>{currentPage + 1}</strong> / {totalPages}
@@ -150,7 +150,7 @@ function FlashCardPage() {
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages - 1}
               >
-                Tiếp theo <ArrowRightOutlined />
+                <span className="pagination-text">Tiếp theo</span> <ArrowRightOutlined />
               </button>
             </div>
           )}
