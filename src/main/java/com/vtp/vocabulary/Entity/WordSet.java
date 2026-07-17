@@ -21,7 +21,7 @@ public class WordSet extends EntityBase{
     @Column(name = "SET_NAME")
     private String setName;
 
-    @Column(name = "DESCRIPTION")
+    @Column(name = "DESCRIPTION", columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "USER_ID")
