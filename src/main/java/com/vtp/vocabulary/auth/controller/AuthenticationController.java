@@ -23,7 +23,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    String login(@RequestBody RegisterRequest request){
+    String register(@RequestBody RegisterRequest request){
         authenticationService.register(request);
         return "register success";
     }

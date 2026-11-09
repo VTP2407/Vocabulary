@@ -68,8 +68,9 @@ public class WordService{
         WordSet wordSet = wordSetRepository.findById(wordSetId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.WORD_SET_NOT_FOUND));
 
-        if (!wordSet.getUserId().equals(CurrentUserUtils.getUserId())) {
-            throw new RuntimeException("Không phải chủ thì đừng động vào");
+        Long currentUserId = CurrentUserUtils.getUserId();
+        if (currentUserId == null || !wordSet.getUserId().equals(currentUserId)) {
+            throw new BusinessException(ErrorCode.ACCESS_DENIED);
         }
 
         wordSet.setSetName(request.getSetName());

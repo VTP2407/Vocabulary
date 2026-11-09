@@ -37,10 +37,10 @@ public class UserInfoService {
         Long userId = CurrentUserUtils.getUserId();
 
         if (userId == null) {
-            throw new RuntimeException("userId null rồi");
+            throw new BusinessException(ErrorCode.UNAUTHORIZED);
         }
 
-        UserInfo userInfo = userInfoRepository.findByUserId(CurrentUserUtils.getUserId())
+        UserInfo userInfo = userInfoRepository.findByUserId(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_EXIST));
         String imageUrl = null;
 
@@ -51,7 +51,7 @@ public class UserInfoService {
         }
 
         return MyUserInfoResponse.builder()
-                .username(userRepository.findUsernameById(CurrentUserUtils.getUserId())
+                .username(userRepository.findUsernameById(userId)
                         .orElseThrow(()-> new BusinessException(ErrorCode.USER_NOT_EXIST)))
                 .email(CurrentUserUtils.getEmail())
                 .fullName(userInfo.getFullName())
@@ -60,7 +60,12 @@ public class UserInfoService {
     }
 
     public String changePassword(ChangePasswordRequest request){
-        User user = userRepository.findById(Objects.requireNonNull(CurrentUserUtils.getUserId()))
+        Long userId = CurrentUserUtils.getUserId();
+        if (userId == null) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED);
+        }
+
+        User user = userRepository.findById(userId)
                 .orElseThrow(()-> new BusinessException(ErrorCode.USER_NOT_EXIST));
 
         if(!request.getNewPassword().equals(request.getReNewPassword())){
@@ -81,7 +86,12 @@ public class UserInfoService {
     }
 
     public UpdateInfoResponse updateInfo(UpdateInfoRequest request){
-        UserInfo userInfo = userInfoRepository.findByUserId(CurrentUserUtils.getUserId())
+        Long userId = CurrentUserUtils.getUserId();
+        if (userId == null) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED);
+        }
+
+        UserInfo userInfo = userInfoRepository.findByUserId(userId)
                 .orElseThrow(()->new BusinessException(ErrorCode.USER_NOT_EXIST));
         if(!request.getFullName().isEmpty()){
             userInfo.setFullName(request.getFullName());
@@ -95,7 +105,12 @@ public class UserInfoService {
 
     @Transactional
     public UpdateImageResponse updateImage(MultipartFile file){
-        UserInfo userInfo = userInfoRepository.findByUserId(CurrentUserUtils.getUserId())
+        Long userId = CurrentUserUtils.getUserId();
+        if (userId == null) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED);
+        }
+
+        UserInfo userInfo = userInfoRepository.findByUserId(userId)
                 .orElseThrow(()-> new BusinessException(ErrorCode.USER_NOT_EXIST));
         File oldFile = null;
 

@@ -4,6 +4,7 @@ import com.vtp.vocabulary.Entity.SavedWord;
 import com.vtp.vocabulary.Entity.SavedWordSet;
 import com.vtp.vocabulary.Entity.Word;
 import com.vtp.vocabulary.Entity.WordSet;
+import com.vtp.vocabulary.enumeration.Visibility;
 import com.vtp.vocabulary._product.repository.*;
 import com.vtp.vocabulary.auth.config.CurrentUserUtils;
 import com.vtp.vocabulary.dto.response.LearningWordResponse;
@@ -33,6 +34,11 @@ public class SavedWordSetService {
                 .orElseThrow(() ->
                         new BusinessException(ErrorCode.WORD_SET_NOT_FOUND)
                 );
+
+        if (sourceWordSet.getVisibility() == Visibility.PRIVATE &&
+                (currentUserId == null || !sourceWordSet.getUserId().equals(currentUserId))) {
+            throw new BusinessException(ErrorCode.ACCESS_DENIED);
+        }
 
         boolean existed = savedWordSetRepository
                 .existsByUserIdAndSourceWordSetId(

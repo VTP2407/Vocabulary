@@ -123,10 +123,16 @@ public class WordSetService {
     }
 
     public PublicWordSetDetail getPublicWordSetDetail(Long wordSetId){
-        List<Word> words = wordRepository.findAllByWordSetId(wordSetId);
-
         WordSet wordSet = wordSetRepository.findById(wordSetId)
                 .orElseThrow(()->new BusinessException(ErrorCode.WORD_SET_NOT_FOUND));
+
+        Long currentUserId = CurrentUserUtils.getUserId();
+        if (wordSet.getVisibility() == Visibility.PRIVATE &&
+                (currentUserId == null || !wordSet.getUserId().equals(currentUserId))) {
+            throw new BusinessException(ErrorCode.ACCESS_DENIED);
+        }
+
+        List<Word> words = wordRepository.findAllByWordSetId(wordSetId);
 
         return PublicWordSetDetail.builder()
                 .createBy(userInfoRepository.getFullNameByUserId(wordSet.getUserId()))
@@ -140,8 +146,9 @@ public class WordSetService {
         WordSet wordSet = wordSetRepository.findById(wordSetId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.WORD_SET_NOT_FOUND));
 
-        if (!wordSet.getUserId().equals(CurrentUserUtils.getUserId())) {
-            throw new RuntimeException("Bạn không có quyền xóa bộ từ vựng này!");
+        Long currentUserId = CurrentUserUtils.getUserId();
+        if (currentUserId == null || !wordSet.getUserId().equals(currentUserId)) {
+            throw new BusinessException(ErrorCode.ACCESS_DENIED);
         }
 
         wordSetRepository.delete(wordSet);

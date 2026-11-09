@@ -19,7 +19,9 @@ public enum ErrorCode {
     MUST_SAME_2_PASSWORD("403","Password and rePassword must be same"),
     EMAIL_NOT_FOUND("404", "Email not found"),
     EMAIL_WAS_USED("404", "Email was used by other people"),
-    INVALID_GOOGLE_TOKEN("400","invalid google token")
+    INVALID_GOOGLE_TOKEN("400","invalid google token"),
+    UNAUTHORIZED("401", "Unauthorized"),
+    ACCESS_DENIED("403", "Access denied: You do not have permission to perform this action")
     ;
     private final String code;
     private final String message;
